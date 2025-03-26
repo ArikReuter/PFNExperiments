@@ -1,5 +1,7 @@
 import torch 
-
+from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LogisticRegression
+import sklearn
 import pandas as pd
 
 class EvaluatePredictions:
@@ -32,12 +34,15 @@ class EvaluatePredictions:
             pprogram_name: str,
             posterior_model_samples: list[dict],
             comparison_model_samples: list[list[dict]],
+            baselines_regression: list[sklearn.base.BaseEstimator] = [LinearRegression()],
+            baselines_classification: list[sklearn.base.BaseEstimator] = [LogisticRegression()],
     ):
         """
         Args:
             pprogram_name: str: the name of the probabilistic program.
             posterior_model_samples: list of dictionaries containing the samples of the posterior model.
             comparison_model_samples: list of lists of dictionaries containing the samples of the comparison models.
+            baselines: list of dictionaries containing the baselines.
         """
 
         self.pprogram_name = pprogram_name
@@ -47,6 +52,8 @@ class EvaluatePredictions:
         self.comparison_model_samples = comparison_model_samples
         self.evaluation_results = None
         self.is_regression = False if pprogram_name in ["logreg_ig"] else True
+        self.baselines_regression = baselines_regression
+        self.baselines_classification = baselines_classification
 
     def rmse(self, y_true, y_pred):
         """
@@ -164,6 +171,38 @@ class EvaluatePredictions:
             }
 
         return metrics
+    
+    def evaluate_instance_baseline(
+            self,
+            baseline: sklearn.base.BaseEstimator,
+            x_test: torch.Tensor,
+            y_test: torch.Tensor,
+    ):
+        """
+        Evaluate the predictions for a single baseline instance.
+        Args:
+            baseline: sklearn.base.BaseEstimator: the baseline model
+            x_test: torch.Tensor: the test data
+            y_test: torch.Tensor: the true values
+        """
+        if self.is_regression:
+            baseline.fit(x_test.numpy(), y_test.numpy())
+            y_pred = torch.tensor(baseline.predict(x_test.numpy()))
+            rmse = self.rmse(y_test, y_pred)
+            r2 = self.r2(y_test, y_pred)
+            metrics = {
+                "rmse": rmse,
+                "r2": r2,
+            }
+        else:
+            baseline.fit(x_test.numpy(), y_test.numpy())
+            y_pred = torch.tensor(baseline.predict(x_test.numpy()))
+            accuracy = self.accuracy(y_test, y_pred)
+            metrics = {
+                "accuracy": accuracy,
+            }
+
+        return metrics
 
     def run_evaluation(
             self,
@@ -187,6 +226,29 @@ class EvaluatePredictions:
                 res_comparison.append(metrics)
 
             evaluation_results["ComparisonModel{}".format(i)] = res_comparison
+
+        # evaluate the baselines
+        if self.is_regression:
+            for i, baseline in enumerate(self.baselines_regression):
+                res_baseline = []
+                for posterior_samples in self.posterior_model_samples:
+                    x_test = posterior_samples["x_test"].squeeze()
+                    y_test = posterior_samples["y_test"].squeeze()
+                    metrics = self.evaluate_instance_baseline(baseline, x_test, y_test)
+                    res_baseline.append(metrics)
+                evaluation_results["Baseline{}".format(i)] = res_baseline
+
+        else:
+            for i, baseline in enumerate(self.baselines_classification):
+                res_baseline = []
+                for posterior_samples in self.posterior_model_samples:
+                    x_test = posterior_samples["x_test"].squeeze()
+                    y_test = posterior_samples["y_test"].squeeze()
+                    metrics = self.evaluate_instance_baseline(baseline, x_test, y_test)
+                    res_baseline.append(metrics)
+                evaluation_results["Baseline{}".format(i)] = res_baseline
+
+                
 
         # convert the results to a DataFrame
         self.evaluation_results_raw = evaluation_results
