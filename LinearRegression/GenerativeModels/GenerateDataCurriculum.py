@@ -527,18 +527,17 @@ class SyntheticDataCurriculumBatched(SyntheticDataCurriculum):
         if self.generate_test_data_in_nonmeta_datasets:
             for key, value in lm_res.items():
                 value_shape = list(value.shape)
-                # split the tensor into train and test if the axis has length 2* self.n
-                if len(value_shape) > 1 and value_shape[0] == 2 * self.n:
+                # find the axis of shape 2 * self.n if it exists
+                axis = None
+                for i, s in enumerate(value_shape):
+                    if s == 2 * self.n:
+                        axis = i
+                        break
+                if axis is not None:
                     lm_res[key] = value[:self.n]
                     lm_res[f"{key}_test"] = value[self.n:]
-                elif len(value_shape) == 1 and value_shape[0] == 2 * self.n:
-                    lm_res[key] = value[:self.n]
-                    lm_res[f"{key}_test"] = value[self.n:]
-                elif len(value_shape) > 1 and value_shape[1] == 2 * self.n:
-                    lm_res[key] = value[:, :self.n]
-                    lm_res[f"{key}_test"] = value[:, self.n:]
+    
 
-                
         self.stored_samples = {
             "start_idx": start_idx,
             "end_idx": start_idx + n_samples,
