@@ -66,6 +66,12 @@ class PyroMAPPredictor():
         """
         fit the model
         """
+
+        try: 
+            X = torch.tensor(X, dtype=torch.float32)
+            y = torch.tensor(y, dtype=torch.float32)
+        except:
+            pass
         self.map_estimates = self.vi_MAP.sample_posterior(X,y)
 
     def predict(self,
