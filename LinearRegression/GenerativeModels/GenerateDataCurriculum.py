@@ -525,6 +525,7 @@ class SyntheticDataCurriculumBatched(SyntheticDataCurriculum):
                 break
 
         if self.generate_test_data_in_nonmeta_datasets:
+            new_lm_res = {}
             for key, value in lm_res.items():
                 value_shape = list(value.shape)
                 # find the axis of shape 2 * self.n if it exists
@@ -535,7 +536,9 @@ class SyntheticDataCurriculumBatched(SyntheticDataCurriculum):
                         break
                 if axis is not None:
                     lm_res[key] = value[:self.n]
-                    lm_res[f"{key}_test"] = value[self.n:]
+                    new_lm_res[f"{key}_test"] = value[self.n:]
+
+            lm_res.update(new_lm_res)
     
 
         self.stored_samples = {
