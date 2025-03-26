@@ -196,8 +196,8 @@ class EvaluatePredictions:
         for key, value in self.evaluation_results_raw.items():
             metrics = pd.DataFrame(value)
             evaluation_results[key] = {
-                "mean": metrics.mean().to_dict(),
-                "std": metrics.std().to_dict()
+                "mean": metrics.mean().detach().item().to_dict(),
+                "std": metrics.std().detach().item().to_dict()
             }
 
         self.evaluation_results = evaluation_results
