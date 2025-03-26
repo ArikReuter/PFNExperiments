@@ -44,9 +44,10 @@ class PyroMAPPredictor():
         """
         predict the MAP estimate
         """
-        posterior_mean = self.vi_MAP.guide.median(X)["y"]
+        beta = self.map_estimates["beta"]
+        beta0 = self.map_estimates["beta0"]
 
-        return posterior_mean
+        return torch.matmul(X,beta) + beta0
 
 
         
