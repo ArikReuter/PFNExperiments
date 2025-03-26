@@ -415,7 +415,9 @@ class RunExperiments():
             save_path=self.config["BASIC"]["Save_path"] + "/synthetic_evaluation_predictions",
         )
 
-        self.evaluator_predictions_synthetic.run_evaluation()
+        r_pred = self.evaluator_predictions_synthetic.run_evaluation()
+
+        print(r_pred)
 
     def evaluate_real_world(self):
         """
