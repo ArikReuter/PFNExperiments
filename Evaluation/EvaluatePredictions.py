@@ -112,7 +112,7 @@ class EvaluatePredictions:
         if not self.use_intercept:
             assert samples_beta.shape[1] == x_test.shape[1], "The number of features in the samples_beta and x_test must be equal. But got {} and {}.".format(samples_beta.shape[1], x_test.shape[1])
         else:
-            assert samples_beta.shape[1] == x_test.shape[1] - 1, "The number of features in the samples_beta and x_test must be equal. But got {} and {}.".format(samples_beta.shape[1], x_test.shape[1])        
+            assert samples_beta.shape[1] == x_test.shape[1] + 1, "The number of features in the samples_beta and x_test must be equal. But got {} and {}.".format(samples_beta.shape[1], x_test.shape[1])        
 
         if self.use_intercept:
             x_test = torch.cat([torch.ones(x_test.shape[0], 1), x_test], dim=1)
