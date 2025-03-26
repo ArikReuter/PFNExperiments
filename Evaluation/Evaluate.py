@@ -290,6 +290,12 @@ class Evaluate:
 
         return posterior_samples
     
+    def only_sample_posterior(self):
+        """
+        Only sample the posterior model
+        """
+        self.posterior_model_samples = self.sample_posterior_model(self.posterior_model, is_comparison_model=False)
+        self.comparison_model_samples = [self.sample_posterior_model(model, is_comparison_model = True) for model in self.comparison_models]
 
     def _run_eval_raw_results(self) -> tuple:
         """

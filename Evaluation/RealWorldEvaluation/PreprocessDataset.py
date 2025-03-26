@@ -295,7 +295,13 @@ class PreprocessorClassification(Preprocessor):
 
         
 
-        x = self.scale_features(x)
+        x_x_test = torch.cat([x, x_test], dim = 0)
+
+        x_x_test = self.scale_features(x_x_test)
+
+        x = x_x_test[:len(x)]
+        x_test = x_x_test[len(x):]
+
 
         new_dataset = {
             "x": x,
