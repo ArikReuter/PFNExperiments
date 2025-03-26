@@ -535,8 +535,27 @@ class SyntheticDataCurriculumBatched(SyntheticDataCurriculum):
                         axis = i
                         break
                 if axis is not None:
-                    lm_res[key] = value[:self.n]
-                    new_lm_res[f"{key}_test"] = value[self.n:]
+                    # split into train and test along the axis
+                    if axis == 0:
+                        new_lm_res[key] = value[:self.n]
+                        new_lm_res[key + "_test"] = value[self.n:]
+                    if axis == 1:
+                        new_lm_res[key] = value[:, :self.n]
+                        new_lm_res[key + "_test"] = value[:, self.n:]
+                    if axis == 2:
+                        new_lm_res[key] = value[:, :, :self.n]
+                        new_lm_res[key + "_test"] = value[:, :, self.n:]
+                    if axis == 3:
+                        new_lm_res[key] = value[:, :, :, :self.n]
+                        new_lm_res[key + "_test"] = value[:, :, :, self.n:]
+                    if axis == 4:
+                        new_lm_res[key] = value[:, :, :, :, :self.n]
+                        new_lm_res[key + "_test"] = value[:, :, :, :, self.n:]
+                    else:
+                        print(f"Warning: axis {axis} is not implemented")
+                else:
+                    new_lm_res[key] = value
+                    
 
             lm_res.update(new_lm_res)
     
