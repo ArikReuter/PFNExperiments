@@ -109,9 +109,10 @@ class EvaluatePredictions:
             predictions: torch.Tensor: the predictions for y_test. Have shape (n_test_samples,)
         """
 
-        n_posterior_samples, p = samples_beta.shape
-
-        assert x_test.shape[1] == p, "The number of features in x_test must be equal to the number of columns in samples_beta. But got {} and {}.".format(x_test.shape[1], p)
+        if not self.use_intercept:
+            assert samples_beta.shape[1] == x_test.shape[1], "The number of features in the samples_beta and x_test must be equal. But got {} and {}.".format(samples_beta.shape[1], x_test.shape[1])
+        else:
+            assert samples_beta.shape[1] == x_test.shape[1] - 1, "The number of features in the samples_beta and x_test must be equal. But got {} and {}.".format(samples_beta.shape[1], x_test.shape[1])        
 
         if self.use_intercept:
             x_test = torch.cat([torch.ones(x_test.shape[0], 1), x_test], dim=1)
