@@ -120,14 +120,17 @@ class EvaluatePredictions:
         print("Beta")
         print(f"Shape: {samples_beta.shape}")
         print(f"values")
+        print(samples_beta)
 
         print("Beta0")
         print(f"Shape: {samples_beta0.shape}")
         print(f"values")
+        print(samples_beta0)
 
         print("x_test")
         print(f"Shape: {x_test.shape}")
         print(f"values")
+        print(x_test)
 
         raw_preds = torch.einsum('ij,kj->ki', x_test, samples_beta)
         raw_preds = raw_preds + samples_beta0.unsqueeze(1) if samples_beta0 is not None else raw_preds
@@ -135,7 +138,8 @@ class EvaluatePredictions:
         print("raw_preds")
         print(f"Shape: {raw_preds.shape}")
         print(f"values")
-        
+        print(raw_preds)
+
 
         preds = self.response_function(raw_preds)
 
