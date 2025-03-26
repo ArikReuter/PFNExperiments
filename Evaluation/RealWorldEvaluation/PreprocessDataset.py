@@ -128,18 +128,18 @@ class Preprocessor():
             
         indices = torch.randperm(x.shape[0])[:self.N_datapoints]
 
-        x = x[indices]
-        y = y[indices]
+        x_train = x[indices]
+        y_train = y[indices]
 
         test_indices = torch.randperm(x.shape[0])[self.N_datapoints:2*self.N_datapoints]
         x_test = x[test_indices]
         y_test = y[test_indices]
 
         if return_test:
-            return x, y, x_test, y_test
+            return x_train, y_train, x_test, y_test
         
         else:
-            return x, y
+            return x_train, y_train
     
     def _identify_numerical_features(
             self,
@@ -354,18 +354,18 @@ class PreprocessorGammaResponse():
             
         indices = torch.randperm(x.shape[0])[:self.N_datapoints]
 
-        x = x[indices]
-        y = y[indices]
+        x_train = x[indices]
+        y_train = y[indices]
 
         test_indices = torch.randperm(x.shape[0])[self.N_datapoints:2*self.N_datapoints]
         x_test = x[test_indices]
         y_test = y[test_indices]
 
         if return_test:
-            return x, y, x_test, y_test
+            return x_train, y_train, x_test, y_test
         
         else:
-            return x, y
+            return x_train, y_train
         
     def _identify_numerical_features(
             self,
