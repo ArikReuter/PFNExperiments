@@ -81,6 +81,11 @@ class PyroMAPPredictor():
         predict the MAP estimate
         """
         beta = self.map_estimates["beta"].squeeze()
+
+        try: 
+            X = torch.tensor(X, dtype=torch.float32)
+        except:
+            pass
         
         if self.use_intercept:
             intercept = self.map_estimates["beta0"].squeeze()
