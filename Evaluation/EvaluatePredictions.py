@@ -76,7 +76,7 @@ class EvaluatePredictions:
 
         ss_res = torch.sum((y_true - y_pred) ** 2)
         ss_tot = torch.sum((y_true - torch.mean(y_true)) ** 2)
-        return 1 - ss_res / ss_tot
+        return (1 - ss_res / ss_tot).item()
     
     def accuracy(self, y_true, y_pred):
         """
@@ -92,7 +92,7 @@ class EvaluatePredictions:
 
         class_preds = (y_pred > 0.5).float()
         acc = torch.mean((class_preds == y_true).float())
-        return acc
+        return acc.item()
     
 
     def compute_posterior_mean_predictions(
@@ -117,8 +117,25 @@ class EvaluatePredictions:
         assert samples_beta0 is None or len(samples_beta0) == n_posterior_samples, "The number of samples in samples_beta0 must be equal to the number of rows in samples_beta. But got {} and {}.".format(samples_beta0.shape[0], n_posterior_samples)
 
         # compute predictions with einsum
+        print("Beta")
+        print(f"Shape: {samples_beta.shape}")
+        print(f"values")
+
+        print("Beta0")
+        print(f"Shape: {samples_beta0.shape}")
+        print(f"values")
+
+        print("x_test")
+        print(f"Shape: {x_test.shape}")
+        print(f"values")
+
         raw_preds = torch.einsum('ij,kj->ki', x_test, samples_beta)
         raw_preds = raw_preds + samples_beta0.unsqueeze(1) if samples_beta0 is not None else raw_preds
+
+        print("raw_preds")
+        print(f"Shape: {raw_preds.shape}")
+        print(f"values")
+        
 
         preds = self.response_function(raw_preds)
 
