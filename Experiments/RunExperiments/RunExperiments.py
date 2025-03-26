@@ -398,8 +398,8 @@ class RunExperiments():
             overwrite_results=True
         )
 
-        self.eval_res_synthetic = self.evaluator.only_sample_posterior()
-        #self.evaluator.plot_results(max_number_plots=int(self.config["EVALUATION"]["N_synthetic_cases"]))
+        self.eval_res_synthetic = self.evaluator.run_evaluation()
+        self.evaluator.plot_results(max_number_plots=int(self.config["EVALUATION"]["N_synthetic_cases"]))
 
         self.map_predictor = PyroMAPPredictor(
             pprogram_y=self.pprogram1_y,
