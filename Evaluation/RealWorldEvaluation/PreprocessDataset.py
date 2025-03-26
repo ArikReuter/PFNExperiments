@@ -204,8 +204,17 @@ class Preprocessor():
             y = y + torch.randn(y.shape) * self.additive_noise_std
             x = x + torch.randn(x.shape) * self.additive_noise_std
 
-        x = self.scale_features(x)
-        y = self.target_scaler(y)
+        x_x_test = torch.cat([x, x_test], dim = 0)
+        y_y_test = torch.cat([y, y_test], dim = 0)
+
+        x_x_test = self.scale_features(x_x_test)
+        y_y_test = self.target_scaler(y_y_test) 
+
+        x = x_x_test[:len(x)]
+        x_test = x_x_test[len(x):]
+
+        y = y_y_test[:len(y)]
+        y_test = y_y_test[len(y):]
 
         new_dataset = {
             "x": x,
