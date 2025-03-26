@@ -192,24 +192,25 @@ class EvaluatePredictions:
         self.evaluation_results_raw = evaluation_results
 
         # compute std and mean for each metric for each model. Put them into different rows (!) in the same DataFrame. Use one Data Frame for all models
-        # Compute std and mean for each metric for each model.
-
-        all_results = []
+        rows = []
 
         for key, res_list in self.evaluation_results_raw.items():
             res = pd.DataFrame(res_list)
             res_mean = res.mean()
             res_std = res.std()
             
-            # Create rows with model name and type of statistic
-            mean_row = pd.DataFrame([res_mean], index=[f"{key}_mean"])
-            std_row = pd.DataFrame([res_std], index=[f"{key}_std"])
+            # Combine mean and std into one row with suffixed column names
+            combined = {}
+            for col in res.columns:
+                combined[f"{col}_mean"] = res_mean[col]
+                combined[f"{col}_std"] = res_std[col]
             
-            all_results.append(mean_row)
-            all_results.append(std_row)
+            combined["model"] = key
+            rows.append(combined)
 
-        # Concatenate all rows into one DataFrame
-        evaluation_results = pd.concat(all_results)
+        # Create final DataFrame
+        evaluation_results = pd.DataFrame(rows).set_index("model")
+
 
         
         self.evaluation_results = evaluation_results
