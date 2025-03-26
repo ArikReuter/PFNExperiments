@@ -236,9 +236,10 @@ class EvaluatePredictions:
             for i, baseline in enumerate(self.baselines_regression):
                 res_baseline = []
                 for posterior_samples in self.posterior_model_samples:
-                    x_test = posterior_samples["x_test"].squeeze()
-                    y_test = posterior_samples["y_test"].squeeze()
-                    metrics = self.evaluate_instance_baseline(baseline, x_test, y_test)
+                    x_test = torch.tensor(posterior_samples["x_test"].squeeze())
+                    y_test = torch.tensor(posterior_samples["y_test"].squeeze())
+                    metrics = self.evaluate_instance_baseline(baseline, torch.tensor(x_test), torch.tensor(y_test))
+
                     res_baseline.append(metrics)
                 evaluation_results["Baseline{}".format(i)] = res_baseline
 
@@ -246,9 +247,9 @@ class EvaluatePredictions:
             for i, baseline in enumerate(self.baselines_classification):
                 res_baseline = []
                 for posterior_samples in self.posterior_model_samples:
-                    x_test = posterior_samples["x_test"].squeeze()
-                    y_test = posterior_samples["y_test"].squeeze()
-                    metrics = self.evaluate_instance_baseline(baseline, x_test, y_test)
+                    x_test = torch.tensor(posterior_samples["x_test"].squeeze())
+                    y_test = torch.tensor(posterior_samples["y_test"].squeeze())
+                    metrics = self.evaluate_instance_baseline(baseline, torch.tensor(x_test), torch.tensor(y_test))
                     res_baseline.append(metrics)
                 evaluation_results["Baseline{}".format(i)] = res_baseline
 
