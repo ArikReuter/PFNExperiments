@@ -210,11 +210,11 @@ class Preprocessor():
         x_x_test = self.scale_features(x_x_test)
         y_y_test = self.target_scaler(y_y_test) 
 
-        x = x_x_test[:len(x)]
-        x_test = x_x_test[len(x):]
+        x = x_x_test[:self.N_datapoints]
+        x_test = x_x_test[self.N_datapoints:]
 
-        y = y_y_test[:len(y)]
-        y_test = y_y_test[len(y):]
+        y = y_y_test[:self.N_datapoints]
+        y_test = y_y_test[self.N_datapoints:]
 
         new_dataset = {
             "x": x,
@@ -299,8 +299,8 @@ class PreprocessorClassification(Preprocessor):
 
         x_x_test = self.scale_features(x_x_test)
 
-        x = x_x_test[:len(x)]
-        x_test = x_x_test[len(x):]
+        x = x_x_test[:self.N_datapoints]
+        x_test = x_x_test[self.N_datapoints:]
 
 
         new_dataset = {
