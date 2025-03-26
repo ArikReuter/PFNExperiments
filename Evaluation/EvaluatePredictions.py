@@ -118,8 +118,7 @@ class EvaluatePredictions:
 
         # compute predictions with einsum
         raw_preds = torch.einsum('ij,kj->ki', x_test, samples_beta)
-        samples_beta0 = samples_beta0.unsqueeze(1)
-        raw_preds = raw_preds + samples_beta0 if samples_beta0 is not None else raw_preds
+        raw_preds = raw_preds + samples_beta0.unsqueeze(1) if samples_beta0 is not None else raw_preds
 
         preds = self.response_function(raw_preds)
 
@@ -139,10 +138,11 @@ class EvaluatePredictions:
 
         # extract the samples
         samples_beta = posterior_samples["beta"].squeeze()
-        samples_beta0 = posterior_samples["beta0"].squeeze() if self.use_intercept else None
+        
 
         if self.use_intercept:
             samples_beta = samples_beta[:, 1:]
+            samples_beta0 = samples_beta[:, 0]
 
         x_test = posterior_samples["x_test"].squeeze()
         y_test = posterior_samples["y_test"].squeeze()
