@@ -445,7 +445,8 @@ class SyntheticDataCurriculumBatched(SyntheticDataCurriculum):
                 pprogram_covariates: pprogram_X = simulate_X_uniform,
                 seed:int = None,
                 check_data:bool = False,
-                n_samples_to_generate_at_once:int = 10_000
+                n_samples_to_generate_at_once:int = 10_000,
+                generate_test_data_in_nonmeta_datasets:bool = True
                 ):
         """
         a  torch.utils.data.Dataset that generates synthetic data on the fly
@@ -461,6 +462,7 @@ class SyntheticDataCurriculumBatched(SyntheticDataCurriculum):
             seed: int: the seed for the random number generator
             check_data: bool: whether to check the data for numerical issues
             n_samples_to_generate_at_once: int: the number of samples to generate at once
+            generate_test_data_in_nonmeta_datasets: bool: whether to generate test data in non-meta datasets
         """
         if n_samples_to_generate_at_once > n_samples_per_epoch:
             print(f"Warning: n_samples_to_generate_at_once should be smaller than n_samples_per_epoch, but got {n_samples_to_generate_at_once} and {n_samples_per_epoch} respectively. This most likely won't make sense")
@@ -479,6 +481,7 @@ class SyntheticDataCurriculumBatched(SyntheticDataCurriculum):
         self.batch_size = n_samples_to_generate_at_once
         self.n_samples_to_generate_at_once = n_samples_to_generate_at_once
         self.stored_samples = None
+        self.generate_test_data_in_nonmeta_datasets = generate_test_data_in_nonmeta_datasets
 
     def __repr__(self) -> str:
         representation = f"""SyntheticDataCurriculumBatched(
@@ -492,6 +495,7 @@ class SyntheticDataCurriculumBatched(SyntheticDataCurriculum):
         seed = {self.seed},
         check_data = {self.check_data},
         n_samples_to_generate_at_once = {self.n_samples_to_generate_at_once}
+        gerate_test_data_in_nonmeta_datasets = {self.generate_test_data_in_nonmeta_datasets}
         )"""
         return representation
 
@@ -505,7 +509,11 @@ class SyntheticDataCurriculumBatched(SyntheticDataCurriculum):
             dict: the samples
         """
         pprogram = self.pprogram_maker(**self.curriculum(start_idx))
-        x = self.pprogram_covariates(self.n, self.p, n_samples)
+
+        if not self.generate_test_data_in_nonmeta_datasets:
+            x = self.pprogram_covariates(self.n, self.p, n_samples)
+        else:
+            x = self.pprogram_covariates(2 * self.n, self.p, n_samples)
 
         while True:
             lm_res = pprogram(x)
@@ -515,7 +523,22 @@ class SyntheticDataCurriculumBatched(SyntheticDataCurriculum):
                     break
             else:
                 break
-        
+
+        if self.generate_test_data_in_nonmeta_datasets:
+            for key, value in lm_res.items():
+                value_shape = list(value.shape)
+                # split the tensor into train and test if the axis has length 2* self.n
+                if len(value_shape) > 1 and value_shape[0] == 2 * self.n:
+                    lm_res[key] = value[:self.n]
+                    lm_res[f"{key}_test"] = value[self.n:]
+                elif len(value_shape) == 1 and value_shape[0] == 2 * self.n:
+                    lm_res[key] = value[:self.n]
+                    lm_res[f"{key}_test"] = value[self.n:]
+                elif len(value_shape) > 1 and value_shape[1] == 2 * self.n:
+                    lm_res[key] = value[:, :self.n]
+                    lm_res[f"{key}_test"] = value[:, self.n:]
+
+                
         self.stored_samples = {
             "start_idx": start_idx,
             "end_idx": start_idx + n_samples,
