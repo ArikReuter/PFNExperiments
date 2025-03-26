@@ -137,11 +137,14 @@ class EvaluatePredictions:
         """
 
         # extract the samples
-        samples_beta = posterior_samples["beta"]
-        samples_beta0 = posterior_samples["beta0"] if self.use_intercept else None
+        samples_beta = posterior_samples["beta"].squeeze()
+        samples_beta0 = posterior_samples["beta0"].squeeze() if self.use_intercept else None
 
-        x_test = posterior_samples["x_test"]
-        y_test = posterior_samples["y_test"]
+        if self.use_intercept:
+            samples_beta = samples_beta[:, 1:]
+
+        x_test = posterior_samples["x_test"].squeeze()
+        y_test = posterior_samples["y_test"].squeeze()
 
         # compute the predictions
         posterior_mean = self.compute_posterior_mean_predictions(samples_beta, x_test, samples_beta0)
