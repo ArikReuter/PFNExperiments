@@ -29,8 +29,6 @@ class PyroMAPPredictor():
         lr=lr
         )
     
-
-
     def fit(self,
             X: torch.Tensor,
             y: torch.Tensor
@@ -46,7 +44,7 @@ class PyroMAPPredictor():
         """
         predict the MAP estimate
         """
-        posterior_mean = self.vi_MAP.guide.mean(X)["y"]
+        posterior_mean = self.vi_MAP.guide.median(X)["y"]
 
         return posterior_mean
 
