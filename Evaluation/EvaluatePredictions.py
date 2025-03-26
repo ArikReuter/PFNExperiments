@@ -76,7 +76,7 @@ class EvaluatePredictions:
 
         ss_res = torch.sum((y_true - y_pred) ** 2)
         ss_tot = torch.sum((y_true - torch.mean(y_true)) ** 2)
-        return (1 - ss_res / ss_tot).item()
+        return (1 - ss_res / ss_tot).detach().item()
     
     def accuracy(self, y_true, y_pred):
         """
@@ -92,7 +92,7 @@ class EvaluatePredictions:
 
         class_preds = (y_pred > 0.5).float()
         acc = torch.mean((class_preds == y_true).float())
-        return acc.item()
+        return acc.detach().item()
     
 
     def compute_posterior_mean_predictions(
@@ -189,6 +189,17 @@ class EvaluatePredictions:
             evaluation_results["ComparisonModel{}".format(i)] = res_comparison
 
         # convert the results to a DataFrame
+        self.evaluation_results_raw = evaluation_results
+
+        # compute std and mean for each metric for each model
+        evaluation_results = {}
+        for key, value in self.evaluation_results_raw.items():
+            metrics = pd.DataFrame(value)
+            evaluation_results[key] = {
+                "mean": metrics.mean().to_dict(),
+                "std": metrics.std().to_dict()
+            }
+
         self.evaluation_results = evaluation_results
 
         return evaluation_results
