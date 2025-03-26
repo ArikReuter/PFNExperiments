@@ -76,7 +76,7 @@ class EvaluatePredictions:
 
         ss_res = torch.sum((y_true - y_pred) ** 2)
         ss_tot = torch.sum((y_true - torch.mean(y_true)) ** 2)
-        return (1 - ss_res / ss_tot).detach().item()
+        return (1 - ss_res / ss_tot).squeeze().detach().item()
     
     def accuracy(self, y_true, y_pred):
         """
@@ -91,7 +91,7 @@ class EvaluatePredictions:
         assert len(y_true.shape) == 1, "The shapes of y_true and y_pred must be 1-dimensional. But got {} and {}.".format(y_true.shape, y_pred.shape)
 
         class_preds = (y_pred > 0.5).float()
-        acc = torch.mean((class_preds == y_true).float())
+        acc = torch.mean((class_preds == y_true).float()).squeeze()
         return acc.detach().item()
     
 
