@@ -140,7 +140,7 @@ class EvaluatePredictions:
         beta_mean = samples_beta.mean(dim=0)
         raw_preds = torch.matmul(x_test, beta_mean)
         raw_preds = raw_preds + samples_beta0.mean() if samples_beta0 is not None else raw_preds
-        
+
 
         """
         print("raw_preds")
@@ -152,9 +152,9 @@ class EvaluatePredictions:
 
         preds = self.response_function(raw_preds)
 
-        posterior_mean = preds.mean(dim=0)
+        #preds = preds.mean(dim=0)
 
-        return posterior_mean
+        return preds
     
     def evaluate_instance_posterior_samples(
             self,
