@@ -20,7 +20,11 @@ from PFNExperiments.Evaluation.RealWorldEvaluation.PreprocessDataset import Prep
 from PFNExperiments.Evaluation.RealWorldEvaluation.GetDataOpenML import GetDataOpenML
 from PFNExperiments.LinearRegression.GenerativeModels.Name2Pprogram import name2pprogram_maker
 from PFNExperiments.Training.Trainer import visualize_training_results
+from PFNExperiments.Evaluation.EvaluatePredictions import EvaluatePredictions
 import torch
+from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LogisticRegression
+from PFNExperiments.LinearRegression.ComparisonModels.PyroMAPPredictor import PyroMAPPredictor
 
 from PFNExperiments.Training.FlowMatching.CFMLossDiffusionVP import CFMLossDiffusionVP
 
@@ -394,8 +398,24 @@ class RunExperiments():
             overwrite_results=True
         )
 
-        self.eval_res_synthetic = self.evaluator.run_evaluation()
-        self.evaluator.plot_results(max_number_plots=int(self.config["EVALUATION"]["N_synthetic_cases"]))
+        self.eval_res_synthetic = self.evaluator.run_evaluation_no_tests()
+        #self.evaluator.plot_results(max_number_plots=int(self.config["EVALUATION"]["N_synthetic_cases"]))
+
+        self.map_predictor = PyroMAPPredictor(
+            pprogram_y=self.pprogram1_y,
+            pprogram_name=self.config["DATA_GENERATION"]["Pprogram"],
+        )
+
+        self.evaluator_predictions_synthetic = EvaluatePredictions(
+            pprogram_name = self.config["DATA_GENERATION"]["Pprogram"],
+            posterior_model_samples = self.evaluator.posterior_model_samples,
+            comparison_model_samples = self.evaluator.comparison_model_samples,
+            baselines_regression = [LinearRegression(), self.map_predictor],
+            baselines_classification = [LogisticRegression(), self.map_predictor],
+            save_path=self.config["BASIC"]["Save_path"] + "/synthetic_evaluation_predictions",
+        )
+
+        self.evaluator_predictions_synthetic.run_evaluation()
 
     def evaluate_real_world(self):
         """

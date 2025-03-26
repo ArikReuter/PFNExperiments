@@ -3,6 +3,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import LogisticRegression
 import sklearn
 import pandas as pd
+import os
 
 class EvaluatePredictions:
     """
@@ -36,6 +37,7 @@ class EvaluatePredictions:
             comparison_model_samples: list[list[dict]],
             baselines_regression: list[sklearn.base.BaseEstimator] = [LinearRegression()],
             baselines_classification: list[sklearn.base.BaseEstimator] = [LogisticRegression()],
+            save_path: str = None
     ):
         """
         Args:
@@ -43,6 +45,7 @@ class EvaluatePredictions:
             posterior_model_samples: list of dictionaries containing the samples of the posterior model.
             comparison_model_samples: list of lists of dictionaries containing the samples of the comparison models.
             baselines: list of dictionaries containing the baselines.
+            save_path: str: the path to save the results.
         """
 
         self.pprogram_name = pprogram_name
@@ -54,6 +57,7 @@ class EvaluatePredictions:
         self.is_regression = False if pprogram_name in ["logreg_ig"] else True
         self.baselines_regression = baselines_regression
         self.baselines_classification = baselines_classification
+        self.save_path = save_path
 
     def rmse(self, y_true, y_pred):
         """
@@ -248,7 +252,7 @@ class EvaluatePredictions:
                     res_baseline.append(metrics)
                 evaluation_results["Baseline{}".format(i)] = res_baseline
 
-                
+
 
         # convert the results to a DataFrame
         self.evaluation_results_raw = evaluation_results
@@ -273,8 +277,13 @@ class EvaluatePredictions:
         # Create final DataFrame
         evaluation_results = pd.DataFrame(rows).set_index("model")
 
+        if self.save_path is not None:
+            if not os.path.exists(self.save_path):
+                os.makedirs(self.save_path)
+                            
+            evaluation_results.to_csv(f"{self.save_path}/prediction_evaluation.csv")        
 
-        
+
         self.evaluation_results = evaluation_results
 
         return evaluation_results

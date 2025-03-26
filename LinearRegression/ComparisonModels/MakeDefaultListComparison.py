@@ -1,5 +1,5 @@
 from PFNExperiments.LinearRegression.ComparisonModels.Hamiltionion_MC import Hamiltionian_MC
-from pyro.infer.autoguide import AutoDiagonalNormal, AutoMultivariateNormal, AutoLaplaceApproximation, AutoIAFNormal, AutoStructured
+from pyro.infer.autoguide import AutoDiagonalNormal, AutoMultivariateNormal, AutoLaplaceApproximation, AutoIAFNormal, AutoStructured, AutoDelta
 from PFNExperiments.LinearRegression.ComparisonModels.Variational_InferenceAutoguide import Variational_InferenceAutoguide
 
 
@@ -172,3 +172,21 @@ def make_vi_list_lr(
     ]
 
     return model_list
+
+
+def make_MAP_model(
+        pprogram_y
+        ):
+    """
+    Create the MAP model.
+    Args:
+        pprogram_y: a probabilistic program for the response variable
+    """
+    vi_MAP = Variational_InferenceAutoguide(
+        pprogram=pprogram_y,
+        make_guide_fun=AutoDelta,
+        n_steps=2000,
+        n_samples=10,
+        lr=1e-1
+    )
+    return vi_MAP
