@@ -114,10 +114,11 @@ class EvaluatePredictions:
         n_posterior_samples, p = samples_beta.shape
 
         assert x_test.shape[1] == p, "The number of features in x_test must be equal to the number of columns in samples_beta. But got {} and {}.".format(x_test.shape[1], p)
-        assert samples_beta0 is None or samples_beta0.shape[0] == n_posterior_samples, "The number of samples in samples_beta0 must be equal to the number of rows in samples_beta. But got {} and {}.".format(samples_beta0.shape[0], n_posterior_samples)
+        assert samples_beta0 is None or len(samples_beta0) == n_posterior_samples, "The number of samples in samples_beta0 must be equal to the number of rows in samples_beta. But got {} and {}.".format(samples_beta0.shape[0], n_posterior_samples)
 
         # compute predictions with einsum
         raw_preds = torch.einsum('ij,kj->ki', x_test, samples_beta)
+        samples_beta0 = samples_beta0.unsqueeze(1)
         raw_preds = raw_preds + samples_beta0 if samples_beta0 is not None else raw_preds
 
         preds = self.response_function(raw_preds)
