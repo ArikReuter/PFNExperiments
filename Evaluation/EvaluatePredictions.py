@@ -99,14 +99,12 @@ class EvaluatePredictions:
             self,
             samples_beta: torch.Tensor,
             x_test: torch.Tensor,
-            samples_beta0: torch.Tensor = None,
     ):
         """
         Use posterior samples for beta and optionally beta0 (intercept) to predict y_test for x_test 
         Args:
             samples_beta: torch.Tensor: the samples for beta. Have shape (n_posterior_samples, p)
             x_test: torch.Tensor: the test data. Have shape (n_test_samples, p)
-            samples_beta0: torch.Tensor: the samples for beta0 (intercept). Have shape (n_posterior_samples,)
         Returns:
             predictions: torch.Tensor: the predictions for y_test. Have shape (n_test_samples,)
         """
@@ -114,47 +112,21 @@ class EvaluatePredictions:
         n_posterior_samples, p = samples_beta.shape
 
         assert x_test.shape[1] == p, "The number of features in x_test must be equal to the number of columns in samples_beta. But got {} and {}.".format(x_test.shape[1], p)
-        assert samples_beta0 is None or len(samples_beta0) == n_posterior_samples, "The number of samples in samples_beta0 must be equal to the number of rows in samples_beta. But got {} and {}.".format(samples_beta0.shape[0], n_posterior_samples)
 
-        # compute predictions with einsum
-        """
-        print("Beta")
-        print(f"Shape: {samples_beta.shape}")
-        print(f"values")
-        print(samples_beta)
+        if self.use_intercept:
+            x_test = torch.cat([torch.ones(x_test.shape[0], 1), x_test], dim=1)
+        
+        samples_beta = samples_beta.unsqueeze(1)
 
-        print("Beta0")
-        print(f"Shape: {samples_beta0.shape}")
-        print(f"values")
-        print(samples_beta0)
+        pred_raw = torch.matmul(x_test, samples_beta.transpose(1, 2)).squeeze()
+        
+        preds = self.response_function(pred_raw)
 
-        print("x_test")
-        print(f"Shape: {x_test.shape}")
-        print(f"values")
-        print(x_test)
-        """
+        preds_mean = torch.mean(preds, dim=0)
 
-        #raw_preds = torch.einsum('ij,kj->ki', x_test, samples_beta)
-        #raw_preds = raw_preds + samples_beta0.unsqueeze(1) if samples_beta0 is not None else raw_preds
+        return preds_mean
 
-        beta_mean = samples_beta.mean(dim=0)
-        raw_preds = torch.matmul(x_test, beta_mean)
-        raw_preds = raw_preds + samples_beta0.mean() if samples_beta0 is not None else raw_preds
-
-
-        """
-        print("raw_preds")
-        print(f"Shape: {raw_preds.shape}")
-        print(f"values")
-        print(raw_preds)
-        """
-
-
-        preds = self.response_function(raw_preds)
-
-        #preds = preds.mean(dim=0)
-
-        return preds
+        
     
     def evaluate_instance_posterior_samples(
             self,
@@ -168,17 +140,12 @@ class EvaluatePredictions:
 
         # extract the samples
         samples_beta = posterior_samples["beta"].squeeze()
-        
-
-        if self.use_intercept:
-            samples_beta = samples_beta[:, 1:]
-            samples_beta0 = samples_beta[:, 0]
 
         x_test = posterior_samples["x_test"].squeeze()
         y_test = posterior_samples["y_test"].squeeze()
 
         # compute the predictions
-        posterior_mean = self.compute_posterior_mean_predictions(samples_beta, x_test, samples_beta0)
+        posterior_mean = self.compute_posterior_mean_predictions(samples_beta, x_test)
 
         # compute the evaluation metrics
 
