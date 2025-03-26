@@ -60,7 +60,7 @@ class EvaluatePredictions:
         assert y_true.shape == y_pred.shape, "The shapes of y_true and y_pred must be equal. But got {} and {}.".format(y_true.shape, y_pred.shape)
         assert len(y_true.shape) == 1, "The shapes of y_true and y_pred must be 1-dimensional. But got {} and {}.".format(y_true.shape, y_pred.shape)
 
-        return torch.sqrt(torch.mean((y_true - y_pred) ** 2))
+        return torch.sqrt(torch.mean((y_true - y_pred) ** 2)).squeeze().detach().item()
     
     def r2(self, y_true, y_pred):
         """
