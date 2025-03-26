@@ -32,22 +32,19 @@ class EvaluatePredictions:
             pprogram_name: str,
             posterior_model_samples: list[dict],
             comparison_model_samples: list[list[dict]],
-            response_function: callable = lambda x: x,
     ):
         """
         Args:
             pprogram_name: str: the name of the probabilistic program.
             posterior_model_samples: list of dictionaries containing the samples of the posterior model.
             comparison_model_samples: list of lists of dictionaries containing the samples of the comparison models.
-            response_function: callable: the response function to evaluate the predictions.
         """
 
         self.pprogram_name = pprogram_name
         self.use_intercept = self.ppgrogram_name2useintercept[pprogram_name]
-        self.response_function = response_function
+        self.response_function = self.ppgrogram_name2response_function[pprogram_name]
         self.posterior_model_samples = posterior_model_samples
         self.comparison_model_samples = comparison_model_samples
-        self.response_function = response_function
         self.evaluation_results = None
         self.is_regression = False if pprogram_name in ["logreg_ig"] else True
 
