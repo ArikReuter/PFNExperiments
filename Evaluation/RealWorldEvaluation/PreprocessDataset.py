@@ -112,7 +112,8 @@ class Preprocessor():
     def _subsample_data(
         self,
         x: torch.Tensor,
-        y: torch.Tensor
+        y: torch.Tensor,
+        return_test: bool = True
     ) -> dict[str, torch.Tensor]:
         """
         Subsample the data
@@ -130,7 +131,15 @@ class Preprocessor():
         x = x[indices]
         y = y[indices]
 
-        return x, y
+        test_indices = torch.randperm(x.shape[0])[self.N_datapoints:2*self.N_datapoints]
+        x_test = x[test_indices]
+        y_test = y[test_indices]
+
+        if return_test:
+            return x, y, x_test, y_test
+        
+        else:
+            return x, y
     
     def _identify_numerical_features(
             self,
@@ -179,7 +188,7 @@ class Preprocessor():
 
         
 
-        x, y = self._subsample_data(x, y)   
+        x, y, x_test, y_test = self._subsample_data(x, y)   
 
         #x = self.scale_features(x)
         #y = self.target_scaler(y)
@@ -200,6 +209,8 @@ class Preprocessor():
         new_dataset = {
             "x": x,
             "y": y,
+            "x_test": x_test,
+            "y_test": y_test,
             "n_diff_values": n_diff_values
         }
 
@@ -259,7 +270,7 @@ class PreprocessorClassification(Preprocessor):
 
         
 
-        x, y = self._subsample_data(x, y)   
+        x, y, x_test, y_test = self._subsample_data(x, y)   
 
         #x = self.scale_features(x)
         #y = self.target_scaler(y)
@@ -277,6 +288,8 @@ class PreprocessorClassification(Preprocessor):
         new_dataset = {
             "x": x,
             "y": y,
+            "x_test": x_test,
+            "y_test": y_test,
             "n_diff_values": n_diff_values
         }
 
@@ -325,7 +338,8 @@ class PreprocessorGammaResponse():
     def _subsample_data(
         self,
         x: torch.Tensor,
-        y: torch.Tensor
+        y: torch.Tensor,
+        return_test: bool = True
     ) -> dict[str, torch.Tensor]:
         """
         Subsample the data
@@ -343,8 +357,16 @@ class PreprocessorGammaResponse():
         x = x[indices]
         y = y[indices]
 
-        return x, y
-    
+        test_indices = torch.randperm(x.shape[0])[self.N_datapoints:2*self.N_datapoints]
+        x_test = x[test_indices]
+        y_test = y[test_indices]
+
+        if return_test:
+            return x, y, x_test, y_test
+        
+        else:
+            return x, y
+        
     def _identify_numerical_features(
             self,
             x: torch.Tensor
@@ -392,7 +414,7 @@ class PreprocessorGammaResponse():
 
         
 
-        x, y = self._subsample_data(x, y)   
+        x, y, x_test, y_test = self._subsample_data(x, y)   
 
         #x = self.scale_features(x)
         #y = self.target_scaler(y)
@@ -422,6 +444,8 @@ class PreprocessorGammaResponse():
         new_dataset = {
             "x": x,
             "y": y,
+            "x_test": x_test,
+            "y_test": y_test,
             "n_diff_values": n_diff_values
         }
 
