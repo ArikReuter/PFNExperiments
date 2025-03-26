@@ -186,6 +186,11 @@ class Preprocessor():
 
         assert len(x) == len(y), "The number of features and targets is different. got {} and {}".format(len(x), len(y))
 
+        x, n_diff_values = self._identify_numerical_features(x)
+
+        assert x.shape[1] >= self.P_features, "The number of features is smaller than the number of features to use"
+        x = x[:, :self.P_features] # select the first P_features
+        n_diff_values = n_diff_values[:self.P_features]
         
 
         x, y, x_test, y_test = self._subsample_data(x, y)   
@@ -193,11 +198,7 @@ class Preprocessor():
         #x = self.scale_features(x)
         #y = self.target_scaler(y)
 
-        x, n_diff_values = self._identify_numerical_features(x)
-
-        assert x.shape[1] >= self.P_features, "The number of features is smaller than the number of features to use"
-        x = x[:, :self.P_features] # select the first P_features
-        n_diff_values = n_diff_values[:self.P_features]
+        
 
         if self.additive_noise_std > 0:
             y = y + torch.randn(y.shape) * self.additive_noise_std
@@ -268,12 +269,6 @@ class PreprocessorClassification(Preprocessor):
 
         assert len(x) == len(y), "The number of features and targets is different. got {} and {}".format(len(x), len(y))
 
-        
-
-        x, y, x_test, y_test = self._subsample_data(x, y)   
-
-        #x = self.scale_features(x)
-        #y = self.target_scaler(y)
 
         x, n_diff_values = self._identify_numerical_features(x)
 
@@ -282,6 +277,14 @@ class PreprocessorClassification(Preprocessor):
         n_diff_values = n_diff_values[:self.P_features]
         if self.additive_noise_std > 0:
             x = x + torch.randn(x.shape) * self.additive_noise_std
+        
+
+        x, y, x_test, y_test = self._subsample_data(x, y)   
+
+        #x = self.scale_features(x)
+        #y = self.target_scaler(y)
+
+        
 
         x = self.scale_features(x)
 
@@ -412,18 +415,16 @@ class PreprocessorGammaResponse():
 
         assert len(x) == len(y), "The number of features and targets is different. got {} and {}".format(len(x), len(y))
 
-        
-
-        x, y, x_test, y_test = self._subsample_data(x, y)   
-
-        #x = self.scale_features(x)
-        #y = self.target_scaler(y)
-
         x, n_diff_values = self._identify_numerical_features(x)
 
         assert x.shape[1] >= self.P_features, "The number of features is smaller than the number of features to use"
         x = x[:, :self.P_features] # select the first P_features
         n_diff_values = n_diff_values[:self.P_features]
+
+        x, y, x_test, y_test = self._subsample_data(x, y)   
+
+        #x = self.scale_features(x)
+        #y = self.target_scaler(y)
 
         if self.additive_noise_std > 0:
             y = y + torch.randn(y.shape) * self.additive_noise_std
