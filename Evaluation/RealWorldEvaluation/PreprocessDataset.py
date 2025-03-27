@@ -204,17 +204,13 @@ class Preprocessor():
             y = y + torch.randn(y.shape) * self.additive_noise_std
             x = x + torch.randn(x.shape) * self.additive_noise_std
 
-        x_x_test = torch.cat([x, x_test], dim = 0)
-        y_y_test = torch.cat([y, y_test], dim = 0)
+        x = self.scale_features(x)
+        y = self.target_scaler(y) 
 
-        x_x_test = self.scale_features(x_x_test)
-        y_y_test = self.target_scaler(y_y_test) 
+        x_test = self.scale_features(x_test)
+        y_test = self.target_scaler(y_test)
 
-        x = x_x_test[:self.N_datapoints]
-        x_test = x_x_test[self.N_datapoints:2*self.N_datapoints]
-
-        y = y_y_test[:self.N_datapoints]
-        y_test = y_y_test[self.N_datapoints:2*self.N_datapoints]
+        
 
         assert len(x) == len(y), "The number of features and targets is different. got {} and {}".format(len(x), len(y))
         assert len(x_test) == len(y_test), "The number of features and targets is different. got {} and {}".format(len(x_test), len(y_test))
