@@ -49,32 +49,6 @@ class Variational_InferenceAutoguide(PosteriorComparisonModel):
         self.print_lr = print_lr
         self.optim_str = optim
     
-
-
-
-        self.guide = self.make_guide_fun(self.pprogram)
-
-        if optim == "L-BFGS":
-            self.optimizer = PyroOptim(torch.optim.LBFGS, {"lr": lr, "max_iter": n_steps})
-
-        elif optim == "Adam":
-            initial_lr = lr
-            gamma = 1e-3  # final learning rate will be gamma * initial_lr
-            lrd = gamma ** (1 / n_steps)
-            self.optimizer = pyro.optim.ClippedAdam({'lr': initial_lr, 'lrd': lrd})
-        else: 
-            print(f"optimizer {optim} not recognized, using Adam")
-            initial_lr = lr
-            gamma = 1e-3  # final learning rate will be gamma * initial_lr
-            lrd = gamma ** (1 / n_steps)
-            self.optimizer = pyro.optim.ClippedAdam({'lr': initial_lr, 'lrd': lrd})
-            
-
-
-        self.svi = SVI(self.pprogram, self.guide, self.optimizer, loss=Trace_ELBO())
-
-
-
     def generate_guide(self):
         """
         generate the guide
@@ -113,6 +87,32 @@ class Variational_InferenceAutoguide(PosteriorComparisonModel):
         Returns:
             torch.Tensor: the samples from the posterior distribution
         """
+
+        self.guide = self.make_guide_fun(self.pprogram)
+
+        lr = self.lr
+        n_steps = self.n_steps
+
+
+        if self.optim_str == "L-BFGS":
+            self.optimizer = PyroOptim(torch.optim.LBFGS, {"lr": lr, "max_iter": n_steps})
+
+        elif self.optim_str == "Adam":
+            initial_lr = lr
+            gamma = 1e-3  # final learning rate will be gamma * initial_lr
+            lrd = gamma ** (1 / n_steps)
+            self.optimizer = pyro.optim.ClippedAdam({'lr': initial_lr, 'lrd': lrd})
+        else: 
+            print(f"optimizer {self.optim_str} not recognized, using Adam")
+            initial_lr = lr
+            gamma = 1e-3  # final learning rate will be gamma * initial_lr
+            lrd = gamma ** (1 / n_steps)
+            self.optimizer = pyro.optim.ClippedAdam({'lr': initial_lr, 'lrd': lrd})
+            
+
+
+        self.svi = SVI(self.pprogram, self.guide, self.optimizer, loss=Trace_ELBO())
+
         self.do_inference(X, y)
         posterior_samples = pyro.infer.Predictive(self.guide, num_samples=self.n_samples)(X, y)
         return posterior_samples
