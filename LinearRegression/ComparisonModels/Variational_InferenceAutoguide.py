@@ -63,24 +63,46 @@ class Variational_InferenceAutoguide(PosteriorComparisonModel):
         self.guide = self.make_guide_fun(self.pprogram, **self.additional_make_guide_args)
 
 
-    def do_inference(self,
-                X: torch.Tensor,
-                y: torch.Tensor) -> torch.Tensor:
+    def do_inference(self, X: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         """
-        A method that performs variational inference
+        A method that performs variational inference using explicit differentiable loss optimization with L-BFGS.
         Args:
             X: torch.Tensor: the covariates
             y: torch.Tensor: the response variable
         Returns:
-            torch.Tensor: the samples from the posterior distribution
+            torch.Tensor: the final loss value
         """
         pyro.clear_param_store()
+
+        loss_fn = lambda model, guide: Trace_ELBO().differentiable_loss(model, guide, X, y)
+
+        # Capture the model parameters
+        with pyro.poutine.trace(param_only=True) as param_capture:
+            _ = loss_fn(self.pprogram, self.guide)
+
+        params = [site["value"].unconstrained()
+                for site in param_capture.trace.nodes.values()
+                if site["type"] == "param"]
+
+        optimizer = torch.optim.LBFGS(params, lr=self.lr, max_iter=20)  # use a small internal max_iter
+
+        final_loss = None
         for step in range(self.n_steps):
-            self.loss = self.svi.step(X, y)
-            if step % 100 == 0:
-                print('.', end='')
-        print()
-        return self.loss
+            def closure():
+                optimizer.zero_grad()
+                loss = loss_fn(self.pprogram, self.guide)
+                loss.backward()
+                return loss
+
+            loss = optimizer.step(closure)
+            final_loss = loss.item() if isinstance(loss, torch.Tensor) else loss
+
+            if step % 10 == 0:
+                print(f"Step {step}: Loss = {final_loss:.4f}")
+
+        self.loss = final_loss
+        return final_loss
+
 
     def sample_posterior(self,
                 X: torch.Tensor,
