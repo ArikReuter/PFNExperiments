@@ -54,6 +54,7 @@ class PyroMAPPredictor():
         self.vi_MAP = Variational_InferenceAutoguide(
         pprogram=pprogram_y,
         make_guide_fun=AutoDelta,
+        optim = "L-BFGS",
         n_steps=n_steps,
         n_samples=1,
         lr=lr
