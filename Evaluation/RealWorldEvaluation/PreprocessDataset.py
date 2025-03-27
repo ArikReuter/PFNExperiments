@@ -216,6 +216,9 @@ class Preprocessor():
         y = y_y_test[:self.N_datapoints]
         y_test = y_y_test[self.N_datapoints:2*self.N_datapoints]
 
+        assert len(x) == len(y), "The number of features and targets is different. got {} and {}".format(len(x), len(y))
+        assert len(x_test) == len(y_test), "The number of features and targets is different. got {} and {}".format(len(x_test), len(y_test))
+
         new_dataset = {
             "x": x,
             "y": y,
