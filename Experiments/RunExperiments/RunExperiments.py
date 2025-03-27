@@ -422,6 +422,7 @@ class RunExperiments():
         
         r_pred = self.evaluator_predictions_synthetic.run_evaluation()
 
+        print("Results of the predictions synthetic data:")
         print(r_pred)
 
     def evaluate_real_world(self):
@@ -461,9 +462,25 @@ class RunExperiments():
             overwrite_results = True
         )
 
-        self.eval_res_real_world = self.eval_rw.run_evaluation()
+        if string2bool(self.config["EVALUATION"]["run_posterior_sample_eval_real_world"]) is True:
+            self.eval_res_real_world = self.eval_rw.run_evaluation()
+            self.eval_rw.plot_results()
+        else:
+            self.eval_rw.only_sample_posterior()
 
-        self.eval_rw.plot_results()
+        self.evaluator_predictions_rw = EvaluatePredictions(
+            pprogram_name = self.config["DATA_GENERATION"]["Pprogram"],
+            posterior_model_samples = self.eval_rw.posterior_model_samples,
+            comparison_model_samples = self.eval_rw.comparison_model_samples,
+            baselines_regression = [LinearRegression(), self.map_predictor],
+            baselines_classification = [LogisticRegression(), self.map_predictor],
+            save_path=self.config["BASIC"]["Save_path"] + "/realworld_evaluation_predictions",
+        )
+
+        r_pred = self.evaluator_predictions_rw.run_evaluation()
+
+        print("Results of the predictions snthetic data:")
+        print(r_pred)
 
     def run(self):
         """

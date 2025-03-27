@@ -443,3 +443,17 @@ class EvaluateRealWorld(Evaluate):
             "test_results": test_results,
             "res_df": res_df,
         }
+    
+    def only_sample_posterior(self):
+        """
+        Only sample the posterior
+        """
+        self.posterior_model_samples = self.sample_posterior_model(self.posterior_model, is_comparison_model=False)
+        self.comparison_model_samples = [self.sample_posterior_model(model, is_comparison_model=True) for model in self.comparison_models]
+
+        if self.save_path is not None:
+            with open(f"{self.save_path}/posterior_model_samples.pkl", "wb") as f:
+                pickle.dump(self.posterior_model_samples, f)
+            
+            with open(f"{self.save_path}/comparison_model_samples.pkl", "wb") as f:
+                pickle.dump(self.comparison_model_samples, f)
