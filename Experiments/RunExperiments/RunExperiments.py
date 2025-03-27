@@ -430,6 +430,8 @@ class RunExperiments():
         Evaluate the real world data.
         """
 
+        run_posterior_eval = string2bool(self.config["EVALUATION"]["run_posterior_sample_eval"])
+
         target_mean = self.check_model_res[1]["y"]['mean_mean']
         target_var = self.check_model_res[1]["y"]['variance_mean']
 
@@ -462,7 +464,7 @@ class RunExperiments():
             overwrite_results = True
         )
 
-        if string2bool(self.config["EVALUATION"]["run_posterior_sample_eval_real_world"]) is True:
+        if run_posterior_eval:
             self.eval_res_real_world = self.eval_rw.run_evaluation()
             self.eval_rw.plot_results()
         else:
