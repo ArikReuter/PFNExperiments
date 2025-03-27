@@ -35,7 +35,7 @@ class PyroMAPPredictor():
             self,
             pprogram_y,
             pprogram_name: str,
-            lr:float = 1,
+            lr:float = 1e-1,
             n_steps:int = 1000
             ):
         """
@@ -54,7 +54,7 @@ class PyroMAPPredictor():
         self.vi_MAP = Variational_InferenceAutoguide(
         pprogram=pprogram_y,
         make_guide_fun=AutoDelta,
-        optim = "L-BFGS",
+        optim = "Adam",
         n_steps=n_steps,
         n_samples=1,
         lr=lr
