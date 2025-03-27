@@ -388,6 +388,8 @@ class RunExperiments():
         """
         use_intercept = string2bool(self.config["DATA_GENERATION"]["Use_intercept"])
 
+        run_posterior_eval = string2bool(self.config["EVALUATION"]["run_posterior_sample_eval"])
+
         self.evaluator = Evaluate(
             posterior_model=self.full_model,
             evaluation_loader=self.trainer.testset,
@@ -397,9 +399,11 @@ class RunExperiments():
             results_dict_to_latent_variable_comparison_models = just_return_results if not use_intercept else results_dict_to_latent_variable_beta0_and_beta,
             overwrite_results=True
         )
-
-        self.eval_res_synthetic = self.evaluator.run_evaluation()
-        self.evaluator.plot_results(max_number_plots=int(self.config["EVALUATION"]["N_synthetic_cases"]))
+        if run_posterior_eval:
+            self.eval_res_synthetic = self.evaluator.run_evaluation()
+            self.evaluator.plot_results(max_number_plots=int(self.config["EVALUATION"]["N_synthetic_cases"]))
+        else:
+            self.evaluator.only_sample_posterior()
 
         self.map_predictor = PyroMAPPredictor(
             pprogram_y=self.pprogram1_y,
@@ -415,6 +419,7 @@ class RunExperiments():
             save_path=self.config["BASIC"]["Save_path"] + "/synthetic_evaluation_predictions",
         )
 
+        
         r_pred = self.evaluator_predictions_synthetic.run_evaluation()
 
         print(r_pred)
