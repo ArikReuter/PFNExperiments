@@ -248,6 +248,8 @@ class EvaluatePredictions:
                 res_baseline = []
                 for posterior_samples in self.posterior_model_samples:
                     x_test = torch.tensor(posterior_samples["x_test"].squeeze())
+                    x_noise = torch.rand(x_test.shape) * 1e-6
+                    x_test = x_test + x_noise
                     y_test = torch.tensor(posterior_samples["y_test"].squeeze())
                     metrics = self.evaluate_instance_baseline(baseline, torch.tensor(x_test), torch.tensor(y_test))
                     res_baseline.append(metrics)
