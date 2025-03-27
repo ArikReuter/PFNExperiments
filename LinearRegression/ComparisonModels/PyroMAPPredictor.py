@@ -36,7 +36,7 @@ class PyroMAPPredictor():
             pprogram_y,
             pprogram_name: str,
             lr:float = 1e-1,
-            n_steps:int = 1000
+            n_steps:int = 5000
             ):
         """
         Args:
