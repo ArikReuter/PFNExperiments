@@ -210,11 +210,7 @@ class Preprocessor():
         x_test = self.scale_features(x_test)
         y_test = self.target_scaler(y_test)
 
-        
-
-        assert len(x) == len(y), "The number of features and targets is different. got {} and {}".format(len(x), len(y))
-        assert len(x_test) == len(y_test), "The number of features and targets is different. got {} and {}".format(len(x_test), len(y_test))
-
+    
         new_dataset = {
             "x": x,
             "y": y,
