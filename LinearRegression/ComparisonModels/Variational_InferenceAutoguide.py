@@ -48,6 +48,8 @@ class Variational_InferenceAutoguide(PosteriorComparisonModel):
         self.lr = lr
         self.print_lr = print_lr
         self.optim_str = optim
+
+        self.guide 
     
     def generate_guide(self):
         """
@@ -118,6 +120,10 @@ class Variational_InferenceAutoguide(PosteriorComparisonModel):
         return posterior_samples
 
     def __repr__(self) -> str:
+
+        self.guide = self.make_guide_fun(self.pprogram, **self.additional_make_guide_args)
+
+
         rep = "Variational Inference with guide: {}".format(self.guide)
 
         if self.print_lr:
