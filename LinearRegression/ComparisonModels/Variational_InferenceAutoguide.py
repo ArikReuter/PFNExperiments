@@ -11,7 +11,7 @@ from PFNExperiments.LinearRegression.ComparisonModels.PosteriorComparisonModel i
 from pyro.infer.autoguide import AutoDiagonalNormal
 
 from pyro.optim import PyroOptim
-import torch.optim
+import torch.optim as optim
 
 class Variational_InferenceAutoguide(PosteriorComparisonModel):
     """
@@ -22,17 +22,14 @@ class Variational_InferenceAutoguide(PosteriorComparisonModel):
                  pprogram: ppgram_linear_model_return_y,
                  make_guide_fun: callable = AutoDiagonalNormal,
                  additional_make_guide_args: dict = {},
-                 optim:str = "Adam",
-                 n_steps:int = 1000,
+                 n_steps:int = 100,
                  n_samples:int = 200,
-                 lr: float = 1e-1,
+                 lr: float = 1,
                  print_lr: bool = False) -> None:
         """
         Args:
             pprogram: ppgram_linear_model_return_y: the probabilistic program
             make_guide_fun : callable: a function that generates the guide
-            additional_make_guide_args: dict: additional arguments to the make_guide_fun
-            optim: str: the optimizer to use can be "ClippedAdam" or "L-BFGS" 
             n_steps: int: the number of steps to take in the optimization
             lr: float: the learning rate of the optimizer
             print_lr: bool: whether to print the learning rate
@@ -47,29 +44,12 @@ class Variational_InferenceAutoguide(PosteriorComparisonModel):
         self.n_samples = n_samples
         self.lr = lr
         self.print_lr = print_lr
-        self.optim_str = optim
-    
 
 
 
         self.guide = self.make_guide_fun(self.pprogram)
 
-        if optim == "L-BFGS":
-            self.optimizer = PyroOptim(torch.optim.LBFGS, {"lr": lr, "max_iter": n_steps})
-
-        elif optim == "Adam":
-            initial_lr = lr
-            gamma = 1e-3  # final learning rate will be gamma * initial_lr
-            lrd = gamma ** (1 / n_steps)
-            self.optimizer = pyro.optim.ClippedAdam({'lr': initial_lr, 'lrd': lrd})
-        else: 
-            print(f"optimizer {optim} not recognized, using Adam")
-            initial_lr = lr
-            gamma = 1e-3  # final learning rate will be gamma * initial_lr
-            lrd = gamma ** (1 / n_steps)
-            self.optimizer = pyro.optim.ClippedAdam({'lr': initial_lr, 'lrd': lrd})
-            
-
+        self.optimizer = PyroOptim(optim.LBFGS, {"lr": lr, "max_iter": n_steps})
 
         self.svi = SVI(self.pprogram, self.guide, self.optimizer, loss=Trace_ELBO())
 
