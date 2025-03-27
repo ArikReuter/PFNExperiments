@@ -476,8 +476,8 @@ class RunExperiments():
             pprogram_name = self.config["DATA_GENERATION"]["Pprogram"],
             posterior_model_samples = self.eval_rw.posterior_model_samples,
             comparison_model_samples = self.eval_rw.comparison_model_samples,
-            baselines_regression = [LinearRegression(), self.map_predictor],
-            baselines_classification = [LogisticRegression(), self.map_predictor],
+            baselines_regression = [self.map_predictor, LinearRegression(), RandomForestRegressor(), TabPFNRegressor()],
+            baselines_classification = [self.map_predictor, LogisticRegression(), RandomForestClassifier(), TabPFNClassifier()],
             save_path=self.config["BASIC"]["Save_path"] + "/realworld_evaluation_predictions",
         )
 
