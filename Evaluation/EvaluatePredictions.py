@@ -189,6 +189,8 @@ class EvaluatePredictions:
             x_test: torch.Tensor: the test data
             y_test: torch.Tensor: the true values
         """
+        x_noise = torch.randn_like(x_test) * 1e-6 # avoid issues with TabPFN
+        x_test = x_test + x_noise
         if self.is_regression:
             baseline.fit(x_test.numpy(), y_test.numpy())
             y_pred = torch.tensor(baseline.predict(x_test.numpy()))
@@ -248,8 +250,6 @@ class EvaluatePredictions:
                 res_baseline = []
                 for posterior_samples in self.posterior_model_samples:
                     x_test = torch.tensor(posterior_samples["x_test"].squeeze())
-                    x_noise = torch.rand(x_test.shape) * 1e-6
-                    x_test = x_test + x_noise
                     y_test = torch.tensor(posterior_samples["y_test"].squeeze())
                     metrics = self.evaluate_instance_baseline(baseline, torch.tensor(x_test), torch.tensor(y_test))
                     res_baseline.append(metrics)
