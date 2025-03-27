@@ -21,7 +21,7 @@ def make_default_list_comparison(
         make_guide_fun=AutoDiagonalNormal,
         n_steps=5000,
         n_samples=n_samples,
-        lr=10
+        lr=1
     )
 
     vi_multivariate_normal = Variational_InferenceAutoguide(
@@ -29,14 +29,14 @@ def make_default_list_comparison(
         make_guide_fun=AutoMultivariateNormal,
         n_steps=5000,
         n_samples=n_samples,
-        lr=10
+        lr=1
     )
     vi_laplace = Variational_InferenceAutoguide(
         pprogram=pprogram_y,
         make_guide_fun=AutoLaplaceApproximation,
         n_steps=5000,
         n_samples=n_samples,
-        lr=10
+        lr=1
     )
 
     vi_autoIAF = Variational_InferenceAutoguide(
@@ -44,7 +44,7 @@ def make_default_list_comparison(
         make_guide_fun=AutoIAFNormal,
         n_steps=5000,
         n_samples=n_samples,
-        lr=10
+        lr=1e-1
     )
 
     vi_autostrucured = Variational_InferenceAutoguide(
@@ -52,7 +52,7 @@ def make_default_list_comparison(
         make_guide_fun=AutoStructured,
         n_steps=5000,
         n_samples=n_samples,
-        lr=10
+        lr=1
     )
 
     model_list = [
@@ -83,7 +83,7 @@ def make_reduced_list_comparison(
         make_guide_fun=AutoDiagonalNormal,
         n_steps=5000,
         n_samples=n_samples,
-        lr=10
+        lr=1
     )
 
     vi_multivariate_normal = Variational_InferenceAutoguide(
@@ -91,7 +91,7 @@ def make_reduced_list_comparison(
         make_guide_fun=AutoMultivariateNormal,
         n_steps=5000,
         n_samples=n_samples,
-        lr=10
+        lr=1
     )
 
     model_list = [
