@@ -48,8 +48,6 @@ class Variational_InferenceAutoguide(PosteriorComparisonModel):
         self.lr = lr
         self.print_lr = print_lr
         self.optim_str = optim
-
-        self.guide 
     
     def generate_guide(self):
         """
