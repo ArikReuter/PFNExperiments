@@ -54,14 +54,21 @@ class Variational_InferenceAutoguide(PosteriorComparisonModel):
 
         self.guide = self.make_guide_fun(self.pprogram)
 
-        if optim == "Adam":
+        if optim == "L-BFGS":
+            self.optimizer = PyroOptim(torch.optim.LBFGS, {"lr": lr, "max_iter": n_steps})
+
+        elif optim == "Adam":
             initial_lr = lr
             gamma = 1e-3  # final learning rate will be gamma * initial_lr
             lrd = gamma ** (1 / n_steps)
             self.optimizer = pyro.optim.ClippedAdam({'lr': initial_lr, 'lrd': lrd})
-
-        elif optim == "L-BFGS":
-            self.optimizer = PyroOptim(torch.optim.LBFGS, {"lr": lr, "max_iter": n_steps})
+        else: 
+            print(f"optimizer {optim} not recognized, using Adam")
+            initial_lr = lr
+            gamma = 1e-3  # final learning rate will be gamma * initial_lr
+            lrd = gamma ** (1 / n_steps)
+            self.optimizer = pyro.optim.ClippedAdam({'lr': initial_lr, 'lrd': lrd})
+            
 
 
         self.svi = SVI(self.pprogram, self.guide, self.optimizer, loss=Trace_ELBO())
