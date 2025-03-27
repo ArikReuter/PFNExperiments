@@ -1,4 +1,4 @@
-import pyro 
+import pyro
 import torch
 
 import pyro.infer
@@ -10,18 +10,21 @@ from PFNExperiments.LinearRegression.ComparisonModels.PosteriorComparisonModel i
 
 from pyro.infer.autoguide import AutoDiagonalNormal
 
+from pyro.optim import PyroOptim
+import torch.optim as optim
+
 class Variational_InferenceAutoguide(PosteriorComparisonModel):
     """
     Perform variational inference on a given probabilistic program
     """
 
-    def __init__(self, 
+    def __init__(self,
                  pprogram: ppgram_linear_model_return_y,
                  make_guide_fun: callable = AutoDiagonalNormal,
                  additional_make_guide_args: dict = {},
-                 n_steps:int = 2000,
+                 n_steps:int = 100,
                  n_samples:int = 200,
-                 lr: float = 1e-3,
+                 lr: float = 1,
                  print_lr: bool = False) -> None:
         """
         Args:
@@ -41,13 +44,12 @@ class Variational_InferenceAutoguide(PosteriorComparisonModel):
         self.n_samples = n_samples
         self.lr = lr
         self.print_lr = print_lr
-    
+
 
 
         self.guide = self.make_guide_fun(self.pprogram)
 
-
-        self.optimizer = pyro.optim.Adam({"lr": self.lr})
+        self.optimizer = PyroOptim(optim.LBFGS, {"lr": lr, "max_iter": n_steps})
 
         self.svi = SVI(self.pprogram, self.guide, self.optimizer, loss=Trace_ELBO())
 
@@ -61,7 +63,7 @@ class Variational_InferenceAutoguide(PosteriorComparisonModel):
         self.guide = self.make_guide_fun(self.pprogram, **self.additional_make_guide_args)
 
 
-    def do_inference(self,  
+    def do_inference(self,
                 X: torch.Tensor,
                 y: torch.Tensor) -> torch.Tensor:
         """
@@ -79,7 +81,7 @@ class Variational_InferenceAutoguide(PosteriorComparisonModel):
                 print('.', end='')
         print()
         return self.loss
-    
+
     def sample_posterior(self,
                 X: torch.Tensor,
                 y: torch.Tensor) -> torch.Tensor:
@@ -94,7 +96,7 @@ class Variational_InferenceAutoguide(PosteriorComparisonModel):
         self.do_inference(X, y)
         posterior_samples = pyro.infer.Predictive(self.guide, num_samples=self.n_samples)(X, y)
         return posterior_samples
-    
+
     def __repr__(self) -> str:
         rep = "Variational Inference with guide: {}".format(self.guide)
 
