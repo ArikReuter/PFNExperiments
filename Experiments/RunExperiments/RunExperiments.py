@@ -24,6 +24,8 @@ from PFNExperiments.Evaluation.EvaluatePredictions import EvaluatePredictions
 import torch
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import LogisticRegression
+from tabpfn import TabPFNClassifier, TabPFNRegressor  
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from PFNExperiments.LinearRegression.ComparisonModels.PyroMAPPredictor import PyroMAPPredictor
 
 from PFNExperiments.Training.FlowMatching.CFMLossDiffusionVP import CFMLossDiffusionVP
@@ -414,8 +416,8 @@ class RunExperiments():
             pprogram_name = self.config["DATA_GENERATION"]["Pprogram"],
             posterior_model_samples = self.evaluator.posterior_model_samples,
             comparison_model_samples = self.evaluator.comparison_model_samples,
-            baselines_regression = [LinearRegression(), self.map_predictor],
-            baselines_classification = [LogisticRegression(), self.map_predictor],
+            baselines_regression = [self.map_predictor, LinearRegression(), RandomForestRegressor(), TabPFNRegressor()],
+            baselines_classification = [self.map_predictor, LogisticRegression(), RandomForestClassifier(), TabPFNClassifier()],
             save_path=self.config["BASIC"]["Save_path"] + "/synthetic_evaluation_predictions",
         )
 
