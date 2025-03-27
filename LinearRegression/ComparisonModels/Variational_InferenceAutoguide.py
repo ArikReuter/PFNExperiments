@@ -11,7 +11,7 @@ from PFNExperiments.LinearRegression.ComparisonModels.PosteriorComparisonModel i
 from pyro.infer.autoguide import AutoDiagonalNormal
 
 from pyro.optim import PyroOptim
-import torch.optim as optim
+import torch.optim
 
 class Variational_InferenceAutoguide(PosteriorComparisonModel):
     """
@@ -61,7 +61,7 @@ class Variational_InferenceAutoguide(PosteriorComparisonModel):
             self.optimizer = pyro.optim.ClippedAdam({'lr': initial_lr, 'lrd': lrd})
 
         elif optim == "L-BFGS":
-            self.optimizer = PyroOptim(optim.LBFGS, {"lr": lr, "max_iter": n_steps})
+            self.optimizer = PyroOptim(torch.optim.LBFGS, {"lr": lr, "max_iter": n_steps})
 
 
         self.svi = SVI(self.pprogram, self.guide, self.optimizer, loss=Trace_ELBO())
