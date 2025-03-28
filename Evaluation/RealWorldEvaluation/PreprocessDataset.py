@@ -288,6 +288,12 @@ class PreprocessorClassification(Preprocessor):
         #x = self.scale_features(x)
         #y = self.target_scaler(y)
 
+        y_med = y.median()
+        y = (y > y_med).float()
+
+        y_test_med = y_test.median()
+        y_test = (y_test > y_test_med).float()
+
     
         x = self.scale_features(x)
         x_test = self.scale_features(x_test)
