@@ -292,9 +292,6 @@ class PreprocessorClassification(Preprocessor):
         x = self.scale_features(x)
         x_test = self.scale_features(x_test)
 
-        y = self.target_scaler(y)
-        y_test = self.target_scaler(y_test)
-
         new_dataset = {
             "x": x,
             "y": y,
