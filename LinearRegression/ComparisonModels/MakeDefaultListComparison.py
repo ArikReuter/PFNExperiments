@@ -81,22 +81,22 @@ def make_reduced_list_comparison(
     vi_diag = Variational_InferenceAutoguide(
         pprogram=pprogram_y,
         make_guide_fun=AutoDiagonalNormal,
-        n_steps=2000,
+        n_steps=10,
         n_samples=n_samples,
         lr=1e-2
     )
 
-    vi_multivariate_normal = Variational_InferenceAutoguide(
-        pprogram=pprogram_y,
-        make_guide_fun=AutoMultivariateNormal,
-        n_steps=2000,
-        n_samples=n_samples,
-        lr=1e-2
-    )
+    #vi_multivariate_normal = Variational_InferenceAutoguide(
+     #   pprogram=pprogram_y,
+     #   make_guide_fun=AutoMultivariateNormal,
+     #   n_steps=2000,
+     #   n_samples=n_samples,
+     #   lr=1e-2
+    #)
 
     model_list = [
         vi_diag,
-        vi_multivariate_normal,
+        #vi_multivariate_normal,
     ]
 
     return model_list
