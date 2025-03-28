@@ -288,15 +288,12 @@ class PreprocessorClassification(Preprocessor):
         #x = self.scale_features(x)
         #y = self.target_scaler(y)
 
-        
+    
+        x = self.scale_features(x)
+        x_test = self.scale_features(x_test)
 
-        x_x_test = torch.cat([x, x_test], dim = 0)
-
-        x_x_test = self.scale_features(x_x_test)
-
-        x = x_x_test[:self.N_datapoints]
-        x_test = x_x_test[self.N_datapoints:]
-
+        y = self.target_scaler(y)
+        y_test = self.target_scaler(y_test)
 
         new_dataset = {
             "x": x,
