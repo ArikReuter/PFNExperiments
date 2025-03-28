@@ -441,8 +441,7 @@ class RunExperiments():
             preprocessor = PreprocessorClassification(
                 N_datapoints = int(self.config["BASIC"]["N"]),
                 P_features = int(self.config["BASIC"]["P"]),
-                target_mean = target_mean,
-                target_var = target_var
+                
             ),
             save_path = self.config["EVALUATION"]["save_path_data_real_world_eval"],
             benchmark_id = self.config["EVALUATION"]["real_world_benchmark_id"]
