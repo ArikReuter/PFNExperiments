@@ -54,9 +54,9 @@ def make_simulate_X_by_loading(
 
         assert len(X.shape) == 3, f"X.shape = {X.shape}, expected shape = {(batch_size, n, p)}" 
 
-        assert X.shape[1] <= n, f"X.shape = {X.shape}, expected shape = {(batch_size, n, p)}"
-        assert X.shape[2] <= p, f"X.shape = {X.shape}, expected shape = {(batch_size, n, p)}"
-        assert X.shape[0] <= batch_size, f"X.shape = {X.shape}, expected shape = {(batch_size, n, p)}" 
+        assert X.shape[1] >= n, f"X.shape = {X.shape}, expected shape = {(batch_size, n, p)}"
+        assert X.shape[2] >= p, f"X.shape = {X.shape}, expected shape = {(batch_size, n, p)}"
+        assert X.shape[0] >= batch_size, f"X.shape = {X.shape}, expected shape = {(batch_size, n, p)}" 
 
         X = X[:, :n, :p]
 
