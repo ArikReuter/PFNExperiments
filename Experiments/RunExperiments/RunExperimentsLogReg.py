@@ -432,6 +432,11 @@ class RunExperiments():
         Evaluate the real world data.
         """
 
+        self.map_predictor = PyroMAPPredictor(
+            pprogram_y=self.pprogram1_y,
+            pprogram_name=self.config["DATA_GENERATION"]["Pprogram"],
+        )
+
         run_posterior_eval = string2bool(self.config["EVALUATION"]["run_posterior_sample_eval"])
 
         target_mean = self.check_model_res[1]["y"]['mean_mean']
@@ -441,7 +446,7 @@ class RunExperiments():
             preprocessor = PreprocessorClassification(
                 N_datapoints = int(self.config["BASIC"]["N"]),
                 P_features = int(self.config["BASIC"]["P"]),
-                
+
             ),
             save_path = self.config["EVALUATION"]["save_path_data_real_world_eval"],
             benchmark_id = self.config["EVALUATION"]["real_world_benchmark_id"]

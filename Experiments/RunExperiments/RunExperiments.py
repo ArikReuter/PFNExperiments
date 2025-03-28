@@ -431,6 +431,10 @@ class RunExperiments():
         """
         Evaluate the real world data.
         """
+        self.map_predictor = PyroMAPPredictor(
+            pprogram_y=self.pprogram1_y,
+            pprogram_name=self.config["DATA_GENERATION"]["Pprogram"],
+        )
 
         run_posterior_eval = string2bool(self.config["EVALUATION"]["run_posterior_sample_eval"])
 
