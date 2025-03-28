@@ -469,7 +469,7 @@ def check_and_plot_data(data: List[Dict[str, torch.tensor]],
                     print(f"Mean of minimums: {stats['mean_minimums'][key]}")
                     print(f"Mean of maximums: {stats['mean_maximums'][key]}")
             print("\n")
-
+    """
     # plot the data
     fig, ax = plt.subplots(1, 2, figsize=(10, 5))
     if "y" in stacked_data.keys():
@@ -523,7 +523,7 @@ def check_and_plot_data(data: List[Dict[str, torch.tensor]],
                     plt.savefig(save_path_plots + f"{key}_Histograms.png")
                 plt.show()
 
-    
+        """
 
     return overall_agg_stats
 
