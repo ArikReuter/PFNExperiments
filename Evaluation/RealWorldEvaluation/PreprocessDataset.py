@@ -457,10 +457,14 @@ class PreprocessorGammaResponse():
         # ensure y is positive
         y = y - y.min() + 1e-5
 
+        # bring vriance 
+        y = y / (y.std() + 1e-5)	
+
         y_test = torch.exp(y_test)
         y_test = boxcox(y_test, self.target_lambda)
         y_test = torch.tensor(y_test, dtype = torch.float)
         y_test = y_test - y_test.min() + 1e-5
+        y_test = y_test / (y_test.std() + 1e-5)
 
         new_dataset = {
             "x": x,
