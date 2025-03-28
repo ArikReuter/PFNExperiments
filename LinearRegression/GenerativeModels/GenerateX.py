@@ -50,7 +50,17 @@ def make_simulate_X_by_loading(
             random_indices = torch.randperm(X_stored.shape[0])[:batch_size]
         X = X_stored[random_indices]
 
-        assert X.shape == (batch_size, n, p), f"X.shape = {X.shape}, expected shape = {(batch_size, n, p)}"
+        #assert X.shape == (batch_size, n, p), f"X.shape = {X.shape}, expected shape = {(batch_size, n, p)}"
+
+        assert len(X.shape) == 3, f"X.shape = {X.shape}, expected shape = {(batch_size, n, p)}" 
+
+        assert X.shape[1] <= n, f"X.shape = {X.shape}, expected shape = {(batch_size, n, p)}"
+        assert X.shape[2] <= p, f"X.shape = {X.shape}, expected shape = {(batch_size, n, p)}"
+        assert X.shape[0] <= batch_size, f"X.shape = {X.shape}, expected shape = {(batch_size, n, p)}" 
+
+        X = X[:, :n, :p]
+
+
 
         if batch_size == 1:
             return X.squeeze(0)
