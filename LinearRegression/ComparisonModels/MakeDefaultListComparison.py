@@ -83,7 +83,7 @@ def make_reduced_list_comparison(
         make_guide_fun=AutoDiagonalNormal,
         n_steps=10,
         n_samples=n_samples,
-        lr=1e-2
+        lr=0.0
     )
 
     #vi_multivariate_normal = Variational_InferenceAutoguide(
