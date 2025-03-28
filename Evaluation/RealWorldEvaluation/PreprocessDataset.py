@@ -436,10 +436,15 @@ class PreprocessorGammaResponse():
         if self.additive_noise_std > 0:
             y = y + torch.randn(y.shape) * self.additive_noise_std
             x = x + torch.randn(x.shape) * self.additive_noise_std
+            x_test = x_test + torch.randn(x_test.shape) * self.additive_noise_std
+            y_test = y_test + torch.randn(y_test.shape) * self.additive_noise_std
+
 
         x = self.scale_features(x)
+        x_test = self.scale_features(x_test)
         
         y = self.target_scaler(y)
+        y_test = self.target_scaler(y_test)
 
         y = torch.exp(y) # the target is the log of the response
         y = boxcox(y, self.target_lambda)
@@ -448,6 +453,11 @@ class PreprocessorGammaResponse():
 
         # ensure y is positive
         y = y - y.min() + 1e-5
+
+        y_test = torch.exp(y_test)
+        y_test = boxcox(y_test, self.target_lambda)
+        y_test = torch.tensor(y_test, dtype = torch.float)
+        y_test = y_test - y_test.min() + 1e-5
 
         new_dataset = {
             "x": x,
