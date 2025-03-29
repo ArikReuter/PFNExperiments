@@ -197,13 +197,6 @@ class TrainerCurriculumNLL(TrainerCurriculum):
         p = z_1.shape[1] 
         zt = torch.ones(z_1.shape[0], p*p + 2*p).to(self.device) # create a tensor of ones with the same shape as z_1
 
-        print(f"""
-              Trainer: 
-              zt shape: {zt.shape}
-              X_y shape: {X_y.shape}
-                t shape: {t.shape}
-                """""
-            )
 
         model_pred = self.model(zt, X_y, t)  # compute the vector field prediction by the model
 
