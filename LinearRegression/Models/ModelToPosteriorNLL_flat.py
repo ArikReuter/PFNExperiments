@@ -54,14 +54,15 @@ class ModelToPosteriorNLL_flat(PosteriorComparisonModel):
 
 
         # duplicate the input x to match the number of samples
-        
-        pred = self.model(x)
+
+        p = self.sample_shape[0]
         batch_size = x.shape[0]
 
-        l = pred.shape[1]  
-        p = int(-1 + (1+l)**0.5) 
-        assert 2*p + p**2 == l, f"the output of the model is not in the right shape, it should be (batch_size, 2*p + p**2) but it is {pred.shape}"
-        
+        zt = torch.ones(batch_size, 2*p + p**2).to(self.device) # create a tensor of ones with the same shape as the input x
+        t = torch.ones(batch_size, 1).to(self.device) # create a tensor of ones with the same shape as the input x
+
+        pred = self.model(zt, x, t)
+
         mean = pred[:, :p]
         cov_diag = pred[:, p:2*p]
         cov_factor = pred[:, 2*p:]
