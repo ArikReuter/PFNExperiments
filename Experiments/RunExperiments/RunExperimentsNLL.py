@@ -228,7 +228,6 @@ class RunExperiments():
             early_stopping_patience = int(self.config["TRAINING"]["Early_stopping_patience"]),
             schedule_step_on = "batch",
             save_path = self.config["BASIC"]["Save_path"],
-            coupling = None,
             use_same_timestep_per_batch = False,
             use_train_mode_during_validation = False,
             max_gradient_norm = float(self.config["TRAINING"]["max_grad_norm"]),
