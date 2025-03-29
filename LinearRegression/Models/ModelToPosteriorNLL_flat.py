@@ -62,6 +62,14 @@ class ModelToPosteriorNLL_flat(PosteriorComparisonModel):
         t = torch.ones(batch_size, 1).to(self.device) # create a tensor of ones with the same shape as the input 
         x = x.to(self.device) # move the input x to the device
 
+        print(f"""
+              Trainer: 
+              zt shape: {zt.shape}
+              X_y shape: {x.shape}
+                t shape: {t.shape}
+                """""
+            )
+
         pred = self.model(zt, x, t)
 
         mean = pred[:, :p]
