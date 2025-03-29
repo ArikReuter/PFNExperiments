@@ -192,8 +192,10 @@ class TrainerCurriculumNLL(TrainerCurriculum):
 
         t = t.float()
 
-        t = torch.ones_like(t) # replace t with ones to avoid the model to learn the time dependency 
-        zt = torch.ones_like(z_1) # replace zt with ones to avoid the model to learn the time dependency
+        t = torch.ones_like(t) # replace t with ones to avoid the model to learn the time dependency
+
+        p = z_1.shape[1] 
+        zt = torch.ones(z_1.shape[0], p*p + 2*p).to(self.device) # create a tensor of ones with the same shape as z_1
 
         model_pred = self.model(zt, X_y, t)  # compute the vector field prediction by the model
 
