@@ -7,6 +7,7 @@ import sys
 from PFNExperiments.LatentFactorModels.GenerativeModels.LatenFactorModel_abstract import return_only_x
 from PFNExperiments.LinearRegression.Models.Transformer_CNF import TransformerCNFConditionalDecoder
 from PFNExperiments.Training.FlowMatching.CFMLossOT2 import CFMLossOT2
+from PFNExperiments.Training.Losses import nll_loss_full_gaussian_flattened_pred
 from PFNExperiments.LinearRegression.Models.ModelToPosteriorNLL_flat import ModelToPosteriorNLL_flat
 from PFNExperiments.LinearRegression.GenerativeModels.Curriculum import Curriculum
 from PFNExperiments.LinearRegression.GenerativeModels.GenerateDataCurriculumCFM import GenerateDataCurriculumCFM
@@ -157,6 +158,8 @@ class RunExperiments_LFM(RunExperiments):
         """
         Setup the training.
         """
+
+        self.loss_function = nll_loss_full_gaussian_flattened_pred
         
         train_config = self.config["TRAINING"]
 
