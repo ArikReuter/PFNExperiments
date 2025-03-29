@@ -27,6 +27,7 @@ from sklearn.linear_model import LogisticRegression
 from tabpfn import TabPFNClassifier, TabPFNRegressor  
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from PFNExperiments.LinearRegression.ComparisonModels.PyroMAPPredictor import PyroMAPPredictor
+from PFNExperiments.Training.Losses import nll_loss_full_gaussian_flattened_pred
 
 from PFNExperiments.Training.FlowMatching.CFMLossDiffusionVP import CFMLossDiffusionVP
 
@@ -214,7 +215,7 @@ class RunExperiments():
 
         )
 
-        
+        self.loss_function = nll_loss_full_gaussian_flattened_pred
 
         self.trainer = TrainerCurriculumNLL(
             model = self.model,
