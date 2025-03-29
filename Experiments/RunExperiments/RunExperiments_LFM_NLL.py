@@ -290,10 +290,6 @@ class RunExperiments_LFM(RunExperiments):
             sample_name= full_model_kwargs["sample_name"],
             n_samples= int(full_model_kwargs["n_samples"]),
             batch_size= int(full_model_kwargs["batch_size"]),
-            solve_adjoint= string2bool(full_model_kwargs["solve_adjoint"]),
-            atol = float(full_model_kwargs["atol"]),
-            rtol = float(full_model_kwargs["rtol"]),
-            epsilon_for_t = epsilon_for_t,
         )
 
     def setup_evaluation(self):
