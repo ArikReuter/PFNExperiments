@@ -52,6 +52,8 @@ class ModelToPosteriorNLL_flat(PosteriorComparisonModel):
             n_samples: int: the number of samples to generate
         """
 
+        x = x.unsqueeze(0) # remove the first dimension of the input x
+
 
         # duplicate the input x to match the number of samples
 
@@ -61,10 +63,6 @@ class ModelToPosteriorNLL_flat(PosteriorComparisonModel):
         zt = torch.ones(batch_size, 2*p + p**2).to(self.device) # create a tensor of ones with the same shape as the input x
         t = torch.ones(batch_size, 1).to(self.device) # create a tensor of ones with the same shape as the input 
         x = x.to(self.device) # move the input x to the device
-
-        zt = zt.unsqueeze(0)
-        t = t.unsqueeze(0)
-        x = x.unsqueeze(0)
 
         pred = self.model(zt, x, t)
 
@@ -83,13 +81,14 @@ class ModelToPosteriorNLL_flat(PosteriorComparisonModel):
 
         # sample from the distribution
         samples = dist.rsample((n_samples,))
+        samples = samples.squeeze(1)
 
-        assert samples.shape[1] == self.sample_shape, f"the shape of the samples is not in the right shape, it should be {self.sample_shape} but it is {samples.shape}"
+        assert samples.shape[1] == self.sample_shape[0], f"the shape of the samples is not in the right shape, it should be {self.sample_shape} but it is {samples.shape}"
 
 
         samples = samples.to(self.target_device)
 
-        return samples[-1]
+        return samples
 
     def sample_posterior_x(self, X: torch.Tensor, n_samples: int) -> torch.Tensor:
         """
