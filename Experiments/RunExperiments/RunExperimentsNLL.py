@@ -137,10 +137,13 @@ class RunExperiments():
         """
         model_kwargs = deepcopy(self.config["MODEL"])
 
+        p = int(model_kwargs["n_input_features_decoder"])
+        dec_out_shape = 2*p + p**2
+
         if model_kwargs["type"] == "TransformerCNFConditionalDecoder":
             self.model = TransformerCNFConditionalDecoder(
                 n_input_features_encoder = int(model_kwargs["n_input_features_encoder"]),
-                n_input_features_decoder = int(model_kwargs["n_input_features_decoder"]),
+                n_input_features_decoder = dec_out_shape,
                 d_model_encoder = int(model_kwargs["d_model_encoder"]),
                 d_model_decoder = int(model_kwargs["d_model_decoder"]),
                 n_heads_encoder = int(model_kwargs["n_heads_encoder"]),
@@ -157,7 +160,7 @@ class RunExperiments():
                 use_positional_encoding_encoder = string2bool(model_kwargs["use_positional_encoding_encoder"]),
                 use_positional_encoding_decoder = string2bool(model_kwargs["use_positional_encoding_decoder"]),
                 use_self_attention_decoder = string2bool(model_kwargs["use_self_attention_decoder"]),
-                output_dim = int(model_kwargs["output_dim"]),
+                output_dim = dec_out_shape,
                 d_final_processing = int(model_kwargs["d_final_processing"]),
                 n_final_layers = int(model_kwargs["n_final_layers"]),
                 dropout_final = float(model_kwargs["dropout_final"]),
