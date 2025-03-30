@@ -80,7 +80,7 @@ def nll_loss_full_gaussian_flattened_pred(pred, target):
   
 
   cov_factor = cov_factor.reshape(batch_size, p, p)
-  cov_diag = cov_diag **2 + 1e-5
+  cov_diag = cov_diag **2 + 1e-3
   dist = torch.distributions.LowRankMultivariateNormal(
       loc = mean,
       cov_factor = cov_factor,
