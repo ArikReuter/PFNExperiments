@@ -259,19 +259,7 @@ class RunExperiments():
         """
         train_config = self.config["TRAINING"]
 
-        if train_config["Loss_function"] == "CFMLossOT2":
-            self.loss_function = CFMLossOT2(
-                sigma_min = float(train_config["Sigma_min"])
-            )
-
-        elif train_config["Loss_function"] == "CFMLossDiffusionVP":
-            self.loss_function = CFMLossDiffusionVP(
-                epsilon_for_t = float(train_config["epsilon_for_t"]),
-                beta_min = float(train_config["beta_min"]),
-                beta_max = float(train_config["beta_max"]),
-            )
-        else:
-            raise ValueError(f"Loss function {train_config['Loss_function']} not implemented yet!")
+        self.loss_function = nll_loss_full_gaussian_flattened_pred
         
         self.optimizer = torch.optim.Adam(
                                           self.model.parameters(), 

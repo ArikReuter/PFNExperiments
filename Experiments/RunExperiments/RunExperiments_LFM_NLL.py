@@ -223,7 +223,8 @@ class RunExperiments_LFM(RunExperiments):
         new_save_path: str: the path to load the model from
         validate: bool: whether to validate the model 
         """
-
+        self.loss_function = nll_loss_full_gaussian_flattened_pred
+        
         train_config = self.config["TRAINING"]
 
         self.optimizer = torch.optim.Adam(
