@@ -297,49 +297,51 @@ class Evaluate:
         self.posterior_model_samples = self.sample_posterior_model(self.posterior_model, is_comparison_model=False)
         self.comparison_model_samples = [self.sample_posterior_model(model, is_comparison_model = True) for model in self.comparison_models]
 
-    def _run_eval_raw_results(self) -> tuple:
+    def _run_eval_raw_results(self, evaluate_against_gt: bool = False) -> tuple:
         """
         Run the evaluation
+        Args:
+            evaluate_against_gt (bool): Whether to run evaluation against ground truth. Default is False.
+
         Returns:
             dict: a dictionary containing the results in form of dataframes
             dict: a dictionary containing the results in form of raw results
         """
-
-      
         posterior_model_samples = self.sample_posterior_model(self.posterior_model, is_comparison_model=False)
-        comparison_model_samples = [self.sample_posterior_model(model, is_comparison_model = True) for model in self.comparison_models]
+        comparison_model_samples = [self.sample_posterior_model(model, is_comparison_model=True) for model in self.comparison_models]
 
-      
         self.posterior_model_samples = posterior_model_samples
         self.comparison_model_samples = comparison_model_samples
 
-       
-        posterior_model_vs_gt = {(str(self.posterior_model), "gt"): self.compare_to_gt.compare(
-                ground_truth_data1=self.evaluation_list,
-                ground_truth_data2=self.evaluation_list_alternative,
-                model_samples=posterior_model_samples
-            ) }
+        posterior_model_vs_gt = {}
+        comparison_models_vs_gt = {}
 
+        if evaluate_against_gt:
+            posterior_model_vs_gt = {
+                (str(self.posterior_model), "gt"): self.compare_to_gt.compare(
+                    ground_truth_data1=self.evaluation_list,
+                    ground_truth_data2=self.evaluation_list_alternative,
+                    model_samples=posterior_model_samples
+                )
+            }
 
-        comparison_models_vs_gt = {
-            (str(model), "gt"): self.compare_to_gt.compare(
-            ground_truth_data1=self.evaluation_list,
-            ground_truth_data2=self.evaluation_list_alternative,
-            model_samples=model_samples
-        ) for model, model_samples in zip(self.comparison_models, comparison_model_samples)
-        }
- 
+            comparison_models_vs_gt = {
+                (str(model), "gt"): self.compare_to_gt.compare(
+                    ground_truth_data1=self.evaluation_list,
+                    ground_truth_data2=self.evaluation_list_alternative,
+                    model_samples=model_samples
+                ) for model, model_samples in zip(self.comparison_models, comparison_model_samples)
+            }
+
         posterior_model_vs_comparison_models = {
             (str(self.posterior_model), str(model)): self.compare_two_models.compare_model_samples(posterior_model_samples, model_samples) for model, model_samples in zip(self.comparison_models, comparison_model_samples)
         }
 
         comparison_models_vs_comparison_models = {}
-        for i in range(len(self.comparison_models)):
-            for j in range(i+1, len(self.comparison_models)):
-                comparison_models_vs_comparison_models[(str(self.comparison_models[i]), str(self.comparison_models[j]))] = self.compare_two_models.compare_model_samples(comparison_model_samples[i], comparison_model_samples[j])
-        
-
-
+        if self.compare_comparison_models_among_each_other:
+            for i in range(len(self.comparison_models)):
+                for j in range(i+1, len(self.comparison_models)):
+                    comparison_models_vs_comparison_models[(str(self.comparison_models[i]), str(self.comparison_models[j]))] = self.compare_two_models.compare_model_samples(comparison_model_samples[i], comparison_model_samples[j])
 
         res_raw = {
             "posterior_model_vs_gt": posterior_model_vs_gt,
@@ -347,89 +349,81 @@ class Evaluate:
             "posterior_model_vs_comparison_models": posterior_model_vs_comparison_models
         }
 
-        if self.compare_comparison_models_among_each_other: 
+        if self.compare_comparison_models_among_each_other:
             res_raw["comparison_models_vs_comparison_models"] = comparison_models_vs_comparison_models
 
-        
         comparison_to_gt_df = {**posterior_model_vs_gt, **comparison_models_vs_gt}
-
         model_comparison_among_each_other = {**posterior_model_vs_comparison_models, **comparison_models_vs_comparison_models}
         model_comparison_among_each_other_df = {key: pd.DataFrame(value) for key, value in model_comparison_among_each_other.items()}
-        
 
-        comparison_to_gt_df2 = comparison_to_gt_df.copy()
-
-        for key, value in comparison_to_gt_df.items():
-            combined_list = []
-            for v_joint, v_gt in zip(value["joint"], value["gt_parameter"]):
-                combined_list.append(v_joint | v_gt)
-        
-
-            comparison_to_gt_df2[key] = pd.DataFrame(combined_list)
+        comparison_to_gt_df2 = {}
+        if evaluate_against_gt:
+            for key, value in comparison_to_gt_df.items():
+                combined_list = []
+                for v_joint, v_gt in zip(value["joint"], value["gt_parameter"]):
+                    combined_list.append(v_joint | v_gt)
+                comparison_to_gt_df2[key] = pd.DataFrame(combined_list)
 
         res_df = {
-            "comparison_to_gt": comparison_to_gt_df2,
+            "comparison_to_gt": comparison_to_gt_df2 if evaluate_against_gt else {},
             "model_comparison_among_each_other": model_comparison_among_each_other_df
         }
 
         if self.save_path is not None:
             with open(f"{self.save_path}/res_raw.pkl", "wb") as f:
                 pickle.dump(res_raw, f)
-            
+
             with open(f"{self.save_path}/res_df.pkl", "wb") as f:
                 pickle.dump(res_df, f)
-
-            
 
         self.res_df = res_df
         self.res_raw = res_raw
 
         return res_df, res_raw
 
-    def summarize_results(self, res_df: dict) -> dict:
+
+    def summarize_results(self, res_df: dict, evaluate_against_gt: bool = False) -> dict:
         """
         Summarize the results of the benchmark
         Args:
             res_df: dict: a dictionary containing the results in form of dataframes, as returned by _run_eval_raw_results
+            evaluate_against_gt (bool): Whether to summarize the GT results. Default is False.
 
         Returns:
             dict: a dictionary containing the summarized results
         """
 
-       
-        comparison_to_gt_df = res_df["comparison_to_gt"]
+        comparison_to_gt_df = res_df.get("comparison_to_gt", {})
         model_comparison_among_each_other_df = res_df["model_comparison_among_each_other"]
 
         comparison_to_gt_summarized_df_list = []
-    
-        for key, df in comparison_to_gt_df.items():
-            model, gt = key
+        if evaluate_against_gt:
+            for key, df in comparison_to_gt_df.items():
+                model, gt = key
 
-            values_mean = df.mean(axis=0).to_dict()
-            column_names = df.columns
-            values_mean2 = {}
+                values_mean = df.mean(axis=0).to_dict()
+                column_names = df.columns
+                values_mean2 = {}
 
-            assert len(column_names) == len(values_mean), "The number of column names and values must be equal"
-            for column_name, (key, value) in zip(column_names, values_mean.items()):
-                values_mean2[f"Mean_{column_name}"] = value
+                assert len(column_names) == len(values_mean), "The number of column names and values must be equal"
+                for column_name, (key, value) in zip(column_names, values_mean.items()):
+                    values_mean2[f"Mean_{column_name}"] = value
 
-            values_std = df.std(axis=0).to_dict()
-            values_std2 = {}
-            for column_name, (key, value) in zip(column_names, values_std.items()):
-                values_std2[f"Std_{column_name}"] = value
+                values_std = df.std(axis=0).to_dict()
+                values_std2 = {}
+                for column_name, (key, value) in zip(column_names, values_std.items()):
+                    values_std2[f"Std_{column_name}"] = value
 
-            row_df = {
-                "Model": model,
-                "GT": gt,
-                **values_mean2,
-                **values_std2
-            }
+                row_df = {
+                    "Model": model,
+                    "GT": gt,
+                    **values_mean2,
+                    **values_std2
+                }
 
-            comparison_to_gt_summarized_df_list.append(row_df)
+                comparison_to_gt_summarized_df_list.append(row_df)
 
-        
         model_comparison_among_each_other_summarized_df_list = []
-
         for key, df in model_comparison_among_each_other_df.items():
             model1, model2 = key
 
@@ -444,9 +438,6 @@ class Evaluate:
             for column_name, (key, value) in zip(column_names, values_std.items()):
                 values_std2[f"Std_{column_name}"] = value
 
-
-            
-
             row_df = {
                 "Model 1": model1,
                 "Model 2": model2,
@@ -457,15 +448,17 @@ class Evaluate:
             model_comparison_among_each_other_summarized_df_list.append(row_df)
 
         res = {
-            "comparison_to_gt": pd.DataFrame(comparison_to_gt_summarized_df_list),
+            "comparison_to_gt": pd.DataFrame(comparison_to_gt_summarized_df_list) if evaluate_against_gt else pd.DataFrame(),
             "model_comparison_among_each_other": pd.DataFrame(model_comparison_among_each_other_summarized_df_list)
         }
 
         if self.save_path is not None:
-            res["comparison_to_gt"].to_csv(f"{self.save_path}/comparison_to_gt_summarized.csv")
+            if evaluate_against_gt:
+                res["comparison_to_gt"].to_csv(f"{self.save_path}/comparison_to_gt_summarized.csv")
             res["model_comparison_among_each_other"].to_csv(f"{self.save_path}/model_comparison_among_each_other_summarized.csv")
 
         return res
+
     
     def plot_results(self, max_number_plots:int = 5, fontsize: int = 12, suptitle: bool = True, bbox_to_anchor=(-0.17, 0.5), width = 5, height = 7, n_rows = 1, plot_gt = False) -> None:
         """
