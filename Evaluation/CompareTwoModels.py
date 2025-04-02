@@ -19,7 +19,7 @@ class CompareTwoModels():
                  metrics = [
                     compare_samples_classifier_based_RF, 
                     compare_samples_classifier_based_NN_Sklearn_Lueck,
-                    compare_samples_classifier_based_NN_RealMLP,
+                    #compare_samples_classifier_based_NN_RealMLP,
                  ]
                     ) -> None:
         """
