@@ -1,7 +1,7 @@
 import torch
 
 from PFNExperiments.Evaluation.BasicMetrics import compare_Wasserstein
-from PFNExperiments.Evaluation.ClassifcationBasedComparison import compare_samples_classifier_based
+from PFNExperiments.Evaluation.ClassifcationBasedComparison import compare_samples_classifier_based_RF, compare_samples_classifier_based_NN_Sklearn_Lueck, compare_samples_classifier_based_NN_RealMLP
 from PFNExperiments.Evaluation.MMD import compare_samples_mmd
 from PFNExperiments.Evaluation.CompareModelToGT import results_dict_to_data_x_y, results_dict_to_latent_variable_beta, flatten_dict_list
 
@@ -17,9 +17,9 @@ class CompareTwoModels():
                  results_dict_to_latent_variable: callable = results_dict_to_latent_variable_beta,
                  results_dict_to_data: callable = results_dict_to_data_x_y,
                  metrics = [
-                    compare_Wasserstein,
-                    compare_samples_mmd,
-                    compare_samples_classifier_based
+                    compare_samples_classifier_based_RF, 
+                    compare_samples_classifier_based_NN_Sklearn_Lueck,
+                    compare_samples_classifier_based_NN_RealMLP,
                  ]
                     ) -> None:
         """
