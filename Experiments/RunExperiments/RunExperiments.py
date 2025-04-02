@@ -402,8 +402,7 @@ class RunExperiments():
             overwrite_results=True
         )
         if run_posterior_eval:
-            self.eval_res_synthetic = self.evaluator.run_evaluation()
-            self.evaluator.plot_results(max_number_plots=int(self.config["EVALUATION"]["N_synthetic_cases"]))
+            self.eval_res_synthetic = self.evaluator.run_evaluation_no_tests()
         else:
             self.evaluator.only_sample_posterior()
 
@@ -411,6 +410,7 @@ class RunExperiments():
             pprogram_y=self.pprogram1_y,
             pprogram_name=self.config["DATA_GENERATION"]["Pprogram"],
         )
+        """
 
         self.evaluator_predictions_synthetic = EvaluatePredictions(
             pprogram_name = self.config["DATA_GENERATION"]["Pprogram"],
@@ -426,6 +426,7 @@ class RunExperiments():
 
         print("Results of the predictions synthetic data:")
         print(r_pred)
+        """
 
     def evaluate_real_world(self):
         """
@@ -471,10 +472,11 @@ class RunExperiments():
         )
 
         if run_posterior_eval:
-            self.eval_res_real_world = self.eval_rw.run_evaluation()
-            self.eval_rw.plot_results()
+            self.eval_res_real_world = self.eval_rw.run_evaluation_no_tests()
         else:
             self.eval_rw.only_sample_posterior()
+
+        """
 
         self.evaluator_predictions_rw = EvaluatePredictions(
             pprogram_name = self.config["DATA_GENERATION"]["Pprogram"],
@@ -489,6 +491,7 @@ class RunExperiments():
 
         print("Results of the predictions snthetic data:")
         print(r_pred)
+        """
 
     def run(self):
         """

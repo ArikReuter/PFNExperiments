@@ -1,6 +1,8 @@
 import sklearn.ensemble
+from sklearn.neural_network import MLPClassifier
 import torch 
 import sklearn 
+from pytabkit import RealMLP_TD_Classifier
 
 
 def compare_samples_classifier_based(P: torch.tensor, 
@@ -65,3 +67,69 @@ def compare_samples_classifier_based(P: torch.tensor,
 
 
 
+def compare_samples_classifier_based_RF(
+    P: torch.tensor, 
+    Q:torch.tensor, 
+    n_folds = 10,
+    balance_classes = True) -> dict:
+    """
+    A function that compares two samples from two distributions using a classifier
+    Args:
+        P: torch.tensor: the samples from the first distribution
+        Q: torch.tensor: the samples from the second distribution
+        n_folds: int: the number of folds to use in the cross validation
+        balance_classes: bool: whether to use as much samples from one class as from the other
+    Returns:
+        float: the ROC AUC score of the classifier
+    """
+    clf = sklearn.ensemble.RandomForestClassifier()
+    return compare_samples_classifier_based(P, Q, clf, n_folds, balance_classes = balance_classes) 
+
+
+def compare_samples_classifier_based_NN_Sklearn_Lueck(
+    P: torch.tensor, 
+    Q:torch.tensor, 
+    n_folds = 10,
+    balance_classes = True) -> dict:
+    """
+    A function that compares two samples from two distributions using a classifier
+    Args:
+        P: torch.tensor: the samples from the first distribution
+        Q: torch.tensor: the samples from the second distribution
+        n_folds: int: the number of folds to use in the cross validation
+        balance_classes: bool: whether to use as much samples from one class as from the other
+    Returns:
+        float: the ROC AUC score of the classifier
+    """
+    n_features = P.shape[1]
+    hidden_layer_size = n_features * 10
+
+    clf = MLPClassifier(
+        activation="relu",
+        hidden_layer_sizes=(10 * hidden_layer_size, 10 * hidden_layer_size),
+        max_iter=10000,
+        solver="adam",
+    )
+
+    return compare_samples_classifier_based(P, Q, clf, n_folds, balance_classes = balance_classes)
+
+
+def compare_samples_classifier_based_NN_RealMLP(
+    P: torch.tensor, 
+    Q:torch.tensor, 
+    n_folds = 10,
+    balance_classes = True) -> dict:
+    """
+    A function that compares two samples from two distributions using a classifier
+    Args:
+        P: torch.tensor: the samples from the first distribution
+        Q: torch.tensor: the samples from the second distribution
+        n_folds: int: the number of folds to use in the cross validation
+        balance_classes: bool: whether to use as much samples from one class as from the other
+    Returns:
+        float: the ROC AUC score of the classifier
+    """
+
+    clf = RealMLP_TD_Classifier() 
+
+    return compare_samples_classifier_based(P, Q, clf, n_folds, balance_classes = balance_classes)

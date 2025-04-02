@@ -10,7 +10,7 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 
 from PFNExperiments.Evaluation.BasicMetrics import compare_Wasserstein, compare_basic_statistics, compare_covariance, compare_marginals
-from PFNExperiments.Evaluation.ClassifcationBasedComparison import compare_samples_classifier_based
+from PFNExperiments.Evaluation.ClassifcationBasedComparison import compare_samples_classifier_based_RF, compare_samples_classifier_based_NN_Sklearn_Lueck, compare_samples_classifier_based_NN_RealMLP
 from PFNExperiments.Evaluation.MMD import compare_samples_mmd
 
 
@@ -30,9 +30,9 @@ def try_otherwise_return_nan(fun: callable) -> callable:
     return wrapper
     
 
-def compare_all_metrics(P: torch.tensor, Q: torch.tensor, methods: list[callable] = [compare_samples_classifier_based, 
-                                                                                     compare_samples_mmd, 
-                                                                                     compare_Wasserstein, 
+def compare_all_metrics(P: torch.tensor, Q: torch.tensor, methods: list[callable] = [compare_samples_classifier_based_RF, 
+                                                                                    compare_samples_classifier_based_NN_Sklearn_Lueck,
+                                                                                    compare_samples_classifier_based_NN_RealMLP,
                                                                                      #compare_Wasserstein, 
                                                                                      #compare_basic_statistics, 
                                                                                      #compare_covariance, 

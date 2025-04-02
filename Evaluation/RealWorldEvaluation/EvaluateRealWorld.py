@@ -444,6 +444,34 @@ class EvaluateRealWorld(Evaluate):
             "res_df": res_df,
         }
     
+    def run_evaluation_no_tests(self, print_results: bool = True) -> dict:
+        """
+        Run the entire evaluation
+        Args:
+            print_results: bool: whether to print the results
+        Returns:
+            dict: a dictionary containing the summarized results and results of the tests:
+                "summarized_results": dict: a dictionary containing the summarized results
+                "test_results": dict: a dictionary containing the results of the tests
+                "res_df": dict: a dictionary containing the results in form of dataframes
+        """
+        res_df, res_raw = self._run_eval_raw_results()
+        summarized_results = self.summarize_results(res_df)
+
+        if print_results:
+            print("Comparison to ground truth:")
+            print()
+            print("Summarized results:")
+            try:
+                display(summarized_results["model_comparison_among_each_other"])
+            except:
+                print(summarized_results["model_comparison_among_each_other"])
+
+        return {
+            "summarized_results": summarized_results,
+            "res_df": res_df,
+        }
+    
     def only_sample_posterior(self):
         """
         Only sample the posterior
