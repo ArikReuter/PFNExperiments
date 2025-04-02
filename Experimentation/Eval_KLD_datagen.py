@@ -178,8 +178,7 @@ if __name__ == "__main__":
         print(f"Setup: {s}, Accuracy: {acc}")
 
         
-    for r in s:
-        print(r)
+    print(setup)
 
 
 
