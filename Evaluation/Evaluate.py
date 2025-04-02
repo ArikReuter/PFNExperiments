@@ -313,6 +313,13 @@ class Evaluate:
         self.posterior_model_samples = posterior_model_samples
         self.comparison_model_samples = comparison_model_samples
 
+        # Only use the first comparison model
+        if len(self.comparison_models) == 0:
+            raise ValueError("At least one comparison model is required.")
+            
+        first_comparison_model = self.comparison_models[0]
+        first_comparison_model_samples = comparison_model_samples[0]
+
         posterior_model_vs_gt = {}
         comparison_models_vs_gt = {}
 
@@ -326,22 +333,27 @@ class Evaluate:
             }
 
             comparison_models_vs_gt = {
-                (str(model), "gt"): self.compare_to_gt.compare(
+                (str(first_comparison_model), "gt"): self.compare_to_gt.compare(
                     ground_truth_data1=self.evaluation_list,
                     ground_truth_data2=self.evaluation_list_alternative,
-                    model_samples=model_samples
-                ) for model, model_samples in zip(self.comparison_models, comparison_model_samples)
+                    model_samples=first_comparison_model_samples
+                )
             }
 
         posterior_model_vs_comparison_models = {
-            (str(self.posterior_model), str(model)): self.compare_two_models.compare_model_samples(posterior_model_samples, model_samples) for model, model_samples in zip(self.comparison_models, comparison_model_samples)
+            (str(self.posterior_model), str(first_comparison_model)): self.compare_two_models.compare_model_samples(
+                posterior_model_samples, first_comparison_model_samples
+            )
         }
 
         comparison_models_vs_comparison_models = {}
         if self.compare_comparison_models_among_each_other:
-            for i in range(len(self.comparison_models)):
-                for j in range(i+1, len(self.comparison_models)):
-                    comparison_models_vs_comparison_models[(str(self.comparison_models[i]), str(self.comparison_models[j]))] = self.compare_two_models.compare_model_samples(comparison_model_samples[i], comparison_model_samples[j])
+            for j in range(1, len(self.comparison_models)):
+                comparison_models_vs_comparison_models[
+                    (str(first_comparison_model), str(self.comparison_models[j]))
+                ] = self.compare_two_models.compare_model_samples(
+                    first_comparison_model_samples, comparison_model_samples[j]
+                )
 
         res_raw = {
             "posterior_model_vs_gt": posterior_model_vs_gt,
@@ -380,6 +392,7 @@ class Evaluate:
         self.res_raw = res_raw
 
         return res_df, res_raw
+
 
 
     def summarize_results(self, res_df: dict, evaluate_against_gt: bool = False) -> dict:
