@@ -348,7 +348,7 @@ class Evaluate:
 
         comparison_models_vs_comparison_models = {}
         if self.compare_comparison_models_among_each_other:
-            for j in range(1, len(self.comparison_models)):
+            for j in tqdm(list(range(1, len(self.comparison_models)))):
                 comparison_models_vs_comparison_models[
                     (str(first_comparison_model), str(self.comparison_models[j]))
                 ] = self.compare_two_models.compare_model_samples(
