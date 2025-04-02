@@ -2,7 +2,7 @@ import sklearn.ensemble
 from sklearn.neural_network import MLPClassifier
 import torch 
 import sklearn 
-from pytabkit import RealMLP_TD_Classifier
+#from pytabkit import RealMLP_TD_Classifier
 
 
 def compare_samples_classifier_based(P: torch.tensor, 
