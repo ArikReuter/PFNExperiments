@@ -83,7 +83,8 @@ def compare_samples_classifier_based_RF(
         float: the ROC AUC score of the classifier
     """
     clf = sklearn.ensemble.RandomForestClassifier()
-    return compare_samples_classifier_based(P, Q, clf, n_folds, balance_classes = balance_classes) 
+    res = compare_samples_classifier_based(P, Q, clf, n_folds, balance_classes = balance_classes)
+    return {"roc_RF": res["cst_roc_auc"]}
 
 
 def compare_samples_classifier_based_NN_Sklearn_Lueck(
@@ -111,7 +112,8 @@ def compare_samples_classifier_based_NN_Sklearn_Lueck(
         solver="adam",
     )
 
-    return compare_samples_classifier_based(P, Q, clf, n_folds, balance_classes = balance_classes)
+    res = compare_samples_classifier_based(P, Q, clf, n_folds, balance_classes = balance_classes)
+    return {"roc_NN_Sklearn_Lueck": res["cst_roc_auc"]}
 
 
 def compare_samples_classifier_based_NN_RealMLP(
@@ -132,4 +134,5 @@ def compare_samples_classifier_based_NN_RealMLP(
 
     clf = RealMLP_TD_Classifier() 
 
-    return compare_samples_classifier_based(P, Q, clf, n_folds, balance_classes = balance_classes)
+    res = compare_samples_classifier_based(P, Q, clf, n_folds, balance_classes = balance_classes)
+    return {"roc_NN_RealMLP": res["cst_roc_auc"]}
