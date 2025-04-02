@@ -109,7 +109,8 @@ def compare_samples_classifier_based_NN_Sklearn_Lueck(
     clf = MLPClassifier(
         activation="relu",
         hidden_layer_sizes=(10 * hidden_layer_size, 10 * hidden_layer_size),
-        max_iter=10000,
+        max_iter=200,
+        early_stopping  = True,
         solver="adam",
     )
 
