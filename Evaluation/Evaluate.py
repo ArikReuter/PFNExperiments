@@ -297,7 +297,9 @@ class Evaluate:
         self.posterior_model_samples = self.sample_posterior_model(self.posterior_model, is_comparison_model=False)
         self.comparison_model_samples = [self.sample_posterior_model(model, is_comparison_model = True) for model in self.comparison_models]
 
-    def _run_eval_raw_results(self) -> tuple:
+    def _run_eval_raw_results(self, 
+                              posterior_model_samples = None,
+                              comparison_model_samples = None) -> tuple:
         """
         Run the evaluation
         Returns:
@@ -305,9 +307,11 @@ class Evaluate:
             dict: a dictionary containing the results in form of raw results
         """
 
-      
-        posterior_model_samples = self.sample_posterior_model(self.posterior_model, is_comparison_model=False)
-        comparison_model_samples = [self.sample_posterior_model(model, is_comparison_model = True) for model in self.comparison_models]
+        if posterior_model_samples is None:
+            posterior_model_samples = self.sample_posterior_model(self.posterior_model, is_comparison_model=False)
+        
+        if comparison_model_samples is None:
+            comparison_model_samples = [self.sample_posterior_model(model, is_comparison_model = True) for model in self.comparison_models]
 
       
         self.posterior_model_samples = posterior_model_samples
@@ -665,7 +669,7 @@ class Evaluate:
             "res_df": res_df,
         }
     
-    def run_evaluation_no_tests(self, print_results: bool = True) -> dict:
+    def run_evaluation_no_tests(self, print_results: bool = True, posterior_model_samples = None, comparison_model_samples = None) -> dict:
         """
         Run the entire evaluation
         Args:
@@ -677,7 +681,7 @@ class Evaluate:
                 "res_df": dict: a dictionary containing the results in form of dataframes
         """
 
-        res_df, res_raw = self._run_eval_raw_results()
+        res_df, res_raw = self._run_eval_raw_results(posterior_model_samples=posterior_model_samples, comparison_model_samples=comparison_model_samples)
         summarized_results = self.summarize_results(res_df)
 
         if print_results:
