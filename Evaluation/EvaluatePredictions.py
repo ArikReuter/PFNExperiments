@@ -168,11 +168,30 @@ class EvaluatePredictions:
                 "rmse": rmse,
                 "r2": r2,
             }
+
         else:
             accuracy = self.accuracy(y_test, posterior_mean)
             metrics = {
                 "accuracy": accuracy,
             }
+
+        # Also get results on training data
+
+        x_train = posterior_samples["x_train"].squeeze()
+        y_train = posterior_samples["y_train"].squeeze()
+        # compute the predictions
+        posterior_mean_train = self.compute_posterior_mean_predictions(samples_beta, x_train)
+
+        # compute the evaluation metrics
+        if self.is_regression:
+            rmse_train = self.rmse(y_train, posterior_mean_train)
+            r2_train = self.r2(y_train, posterior_mean_train)
+            metrics["rmse_train"] = rmse_train
+            metrics["r2_train"] = r2_train
+        else:
+            accuracy_train = self.accuracy(y_train, posterior_mean_train)
+            metrics["accuracy_train"] = accuracy_train
+            metrics["accuracy_train"] = accuracy_train          
 
         return metrics
     
@@ -181,6 +200,8 @@ class EvaluatePredictions:
             baseline: sklearn.base.BaseEstimator,
             x_test: torch.Tensor,
             y_test: torch.Tensor,
+            x_train: torch.Tensor = None,
+            y_train: torch.Tensor = None,
     ):
         """
         Evaluate the predictions for a single baseline instance.
@@ -207,6 +228,23 @@ class EvaluatePredictions:
             metrics = {
                 "accuracy": accuracy,
             }
+
+        # Also get results on training data
+        if x_train is not None and y_train is not None:
+            x_noise = torch.randn_like(x_train) * 1e-6
+            x_train = x_train + x_noise
+            if self.is_regression:
+                y_pred_train = torch.tensor(baseline.predict(x_train.numpy()))
+                rmse_train = self.rmse(y_train, y_pred_train)
+                r2_train = self.r2(y_train, y_pred_train)
+                metrics["rmse_train"] = rmse_train
+                metrics["r2_train"] = r2_train
+            else:
+                y_pred_train = torch.tensor(baseline.predict(x_train.numpy()))
+                accuracy_train = self.accuracy(y_train, y_pred_train)
+                metrics["accuracy_train"] = accuracy_train
+
+        
 
         return metrics
 
