@@ -211,7 +211,7 @@ class EvaluatePredictions:
             y_test: torch.Tensor: the true values
         """
         x_noise = torch.randn_like(x_test) * 1e-6 # avoid issues with TabPFN
-        x_test = x_test + x_noise
+        x_train = x_train + x_noise
         if self.is_regression:
             baseline.fit(x_train.numpy(), y_train.numpy())
             y_pred = torch.tensor(baseline.predict(x_test.numpy()))
