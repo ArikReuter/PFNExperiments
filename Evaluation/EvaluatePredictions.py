@@ -177,8 +177,8 @@ class EvaluatePredictions:
 
         # Also get results on training data
 
-        x_train = posterior_samples["x_train"].squeeze()
-        y_train = posterior_samples["y_train"].squeeze()
+        x_train = posterior_samples["x"].squeeze()
+        y_train = posterior_samples["y"].squeeze()
         # compute the predictions
         posterior_mean_train = self.compute_posterior_mean_predictions(samples_beta, x_train)
 
@@ -278,7 +278,9 @@ class EvaluatePredictions:
                 for posterior_samples in self.posterior_model_samples:
                     x_test = torch.tensor(posterior_samples["x_test"].squeeze())
                     y_test = torch.tensor(posterior_samples["y_test"].squeeze())
-                    metrics = self.evaluate_instance_baseline(baseline, torch.tensor(x_test), torch.tensor(y_test))
+                    x_train = torch.tensor(posterior_samples["x"].squeeze())
+                    y_train = torch.tensor(posterior_samples["y"].squeeze())
+                    metrics = self.evaluate_instance_baseline(baseline, torch.tensor(x_test), torch.tensor(y_test), torch.tensor(x_train), torch.tensor(y_train))
 
                     res_baseline.append(metrics)
                 evaluation_results["Baseline{}".format(i)] = res_baseline
@@ -289,7 +291,9 @@ class EvaluatePredictions:
                 for posterior_samples in self.posterior_model_samples:
                     x_test = torch.tensor(posterior_samples["x_test"].squeeze())
                     y_test = torch.tensor(posterior_samples["y_test"].squeeze())
-                    metrics = self.evaluate_instance_baseline(baseline, torch.tensor(x_test), torch.tensor(y_test))
+                    x_train = torch.tensor(posterior_samples["x"].squeeze())
+                    y_train = torch.tensor(posterior_samples["y"].squeeze())
+                    metrics = self.evaluate_instance_baseline(baseline, torch.tensor(x_test), torch.tensor(y_test), torch.tensor(x_train), torch.tensor(y_train))
                     res_baseline.append(metrics)
                 evaluation_results["Baseline{}".format(i)] = res_baseline
 
