@@ -15,7 +15,7 @@ from PFNExperiments.Evaluation.Evaluate import Evaluate
 from PFNExperiments.Evaluation.RealWorldEvaluation.EvaluateRealWorld import EvaluateRealWorld, just_return_results, results_dict_to_latent_variable_beta0_and_beta
 from PFNExperiments.LinearRegression.GenerativeModels.GenerateX_TabPFN.MakeGenerator import MakeGenerator
 from torch.optim.lr_scheduler import OneCycleLR
-from PFNExperiments.LinearRegression.ComparisonModels.MakeDefaultListComparison import make_default_list_comparison, make_reduced_list_comparison
+from PFNExperiments.LinearRegression.ComparisonModels.MakeDefaultListComparison import make_default_list_comparison, make_reduced_list_comparison, make_VI_list_comparison
 from PFNExperiments.Evaluation.RealWorldEvaluation.PreprocessDataset import Preprocessor
 from PFNExperiments.Evaluation.RealWorldEvaluation.GetDataOpenML import GetDataOpenML
 from PFNExperiments.LinearRegression.GenerativeModels.Name2Pprogram import name2pprogram_maker
@@ -372,16 +372,22 @@ class RunExperiments():
         
         print_code(self.pprogram1)
 
-        if string2bool(self.config["EVALUATION"]["do_full_evaluation"]) is True: 
-            self.comparison_models = make_default_list_comparison(
+        if "eval_only_VI" in self.config["EVALUATION"] and self.config["EVALUATION"]["eval_only_VI"] == "True":
+            self.comparison_models = make_VI_list_comparison(
                 pprogram_y=self.pprogram1_y,
                 n_samples=int(self.config["EVALUATION"]["N_samples_per_model"])
             )
         else:
-            self.comparison_models = make_reduced_list_comparison(
-                pprogram_y=self.pprogram1_y,
-                n_samples=int(self.config["EVALUATION"]["N_samples_per_model"])
-            )
+            if string2bool(self.config["EVALUATION"]["do_full_evaluation"]) is True: 
+                self.comparison_models = make_default_list_comparison(
+                    pprogram_y=self.pprogram1_y,
+                    n_samples=int(self.config["EVALUATION"]["N_samples_per_model"])
+                )
+            else:
+                self.comparison_models = make_reduced_list_comparison(
+                    pprogram_y=self.pprogram1_y,
+                    n_samples=int(self.config["EVALUATION"]["N_samples_per_model"])
+                )
 
         
     def evaluate_synthetic(self):
