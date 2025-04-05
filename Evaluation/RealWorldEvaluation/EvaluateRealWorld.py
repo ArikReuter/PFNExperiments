@@ -203,37 +203,39 @@ class EvaluateRealWorld(Evaluate):
             dict: a dictionary containing the results in form of raw results
         """
 
-      
         posterior_model_samples = self.sample_posterior_model(self.posterior_model, is_comparison_model=False)
         comparison_model_samples = [self.sample_posterior_model(model, is_comparison_model=True) for model in self.comparison_models]
 
-        #print(posterior_model_samples)
-      
         self.posterior_model_samples = posterior_model_samples
         self.comparison_model_samples = comparison_model_samples
 
-    
         posterior_model_vs_comparison_models = {
-            (self.model_names_dict[self.posterior_model], self.model_names_dict[model]): self.compare_two_models.compare_model_samples(posterior_model_samples, model_samples) for model, model_samples in zip(self.comparison_models, comparison_model_samples)
+            (self.model_names_dict[self.posterior_model], self.model_names_dict[model]): self.compare_two_models.compare_model_samples(posterior_model_samples, model_samples)
+            for model, model_samples in zip(self.comparison_models, comparison_model_samples)
         }
 
         comparison_models_vs_comparison_models = {}
-        for i in range(len(self.comparison_models)):
-            for j in range(i+1, len(self.comparison_models)):
-                comparison_models_vs_comparison_models[(self.model_names_dict[self.comparison_models[i]], self.model_names_dict[self.comparison_models[j]])] = self.compare_two_models.compare_model_samples(comparison_model_samples[i], comparison_model_samples[j])
-        
+
+        if self.compare_comparison_models_among_each_other and len(self.comparison_models) > 0:
+            reference_model = self.comparison_models[0]
+            reference_samples = comparison_model_samples[0]
+            for i in range(1, len(self.comparison_models)):
+                model = self.comparison_models[i]
+                samples = comparison_model_samples[i]
+                comparison_models_vs_comparison_models[
+                    (self.model_names_dict[reference_model], self.model_names_dict[model])
+                ] = self.compare_two_models.compare_model_samples(reference_samples, samples)
 
         res_raw = {
             "posterior_model_vs_comparison_models": posterior_model_vs_comparison_models
         }
 
-        if self.compare_comparison_models_among_each_other: 
+        if self.compare_comparison_models_among_each_other:
             res_raw["comparison_models_vs_comparison_models"] = comparison_models_vs_comparison_models
-
 
         model_comparison_among_each_other = {**posterior_model_vs_comparison_models, **comparison_models_vs_comparison_models}
         model_comparison_among_each_other_df = {key: pd.DataFrame(value) for key, value in model_comparison_among_each_other.items()}
-        
+
         res_df = {
             "model_comparison_among_each_other": model_comparison_among_each_other_df
         }
@@ -241,15 +243,15 @@ class EvaluateRealWorld(Evaluate):
         if self.save_path is not None:
             with open(f"{self.save_path}/res_raw.pkl", "wb") as f:
                 pickle.dump(res_raw, f)
-            
+
             with open(f"{self.save_path}/res_df.pkl", "wb") as f:
                 pickle.dump(res_df, f)
 
-            
         self.res_df = res_df
         self.res_raw = res_raw
 
         return res_df, res_raw
+
     
 
     def summarize_results(self, res_df: dict) -> dict:
