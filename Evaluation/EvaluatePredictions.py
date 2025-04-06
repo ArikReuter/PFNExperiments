@@ -89,6 +89,34 @@ class EvaluatePredictions:
         ss_tot = torch.sum((y_true - torch.mean(y_true)) ** 2)
         return (1 - ss_res / ss_tot).squeeze().detach().item()
     
+    def bias_sq(self, y_true, y_pred):
+        """
+        Compute the squared bias.
+        Args:
+            y_true: torch.Tensor: the true values
+            y_pred: torch.Tensor: the predicted values
+        Returns:
+            bias: float: the bias
+        """
+        assert y_true.shape == y_pred.shape, "The shapes of y_true and y_pred must be equal. But got {} and {}.".format(y_true.shape, y_pred.shape)
+        assert len(y_true.shape) == 1, "The shapes of y_true and y_pred must be 1-dimensional. But got {} and {}.".format(y_true.shape, y_pred.shape)
+
+        return torch.mean((y_true - y_pred) ** 2).squeeze().detach().item()
+    
+    def variance(self, y_true, y_pred):
+        """
+        Compute the variance.
+        Args:
+            y_true: torch.Tensor: the true values
+            y_pred: torch.Tensor: the predicted values
+        Returns:
+            variance: float: the variance
+        """
+        assert y_true.shape == y_pred.shape, "The shapes of y_true and y_pred must be equal. But got {} and {}.".format(y_true.shape, y_pred.shape)
+        assert len(y_true.shape) == 1, "The shapes of y_true and y_pred must be 1-dimensional. But got {} and {}.".format(y_true.shape, y_pred.shape)
+
+        return torch.var(y_pred).squeeze().detach().item()
+    
     def accuracy(self, y_true, y_pred):
         """
         Compute the accuracy score.
